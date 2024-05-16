@@ -205,7 +205,7 @@ function getCoins(mysqli $connect, string $email)
     $stmt->execute();
     $result = $stmt->get_result();
     $result = mysqli_fetch_assoc($result);
-    return $result['coins'];
+    return (int)$result['coins'];
 }
 function getPrices(mysqli $connect):array
 {
@@ -223,6 +223,55 @@ function getPrices(mysqli $connect):array
     return $return;
 }
 
+function getHeroById(mysqli $connect, string $email, int $id_hero)
+{
+    //need the cast type (by default they are strings)
+    $effects_field = "effects";
+    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator as enabled,value as price, have_hero.id as owned
+            FROM object 
+            join type on object.id_type = type.id
+            join have_price on object.id = have_price.id_object
+            join price on have_price.id_price = price.id
+            left join user on 1 left JOIN have_hero on object.id = have_hero.id_hero and user.id = have_hero.id_user
+            where type.description = 'hero' and user.email = ? and object.id = ?";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("si", $email,$id_hero);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+
+    $row[$effects_field] = array();
+    $row["id"] = (int)$row["id"];
+    $row["id_type"] = (int)$row["id_type"];
+    $row["health"] = (int)$row["health"];
+    $row["enabled"] = $row["enabled"] != 0;
+    $row["price"] = (int)$row["price"];
+    $row["owned"] = $row["owned"] !== null;
+
+    $hero = $row;
+
+
+
+
+    $sql = "select * 
+            FROM have_effect";
+    $stmt = $connect->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while (($row = $result->fetch_assoc()) != null)
+    {
+        $row["id"] = (int)$row["id"];
+        $row["id_object"] = (int)$row["id_object"];
+        $row["id_effect"] = (int)$row["id_effect"];
+        if($hero["id"] == $row["id_object"])
+        {
+            Array_push($hero[$effects_field],$row["id_effect"]);
+        }
+    }
+
+    return $hero;
+}
+
 function purchaseHero(mysqli $connect, string $email, int $id_hero):void
 {
     $id_user = getUserIdFromEmail($connect,$email);
@@ -230,6 +279,12 @@ function purchaseHero(mysqli $connect, string $email, int $id_hero):void
     $stmt = $connect->prepare($sql);
     $stmt->bind_param("ii", $id_user, $id_hero);
     $stmt->execute();
+
+    $coins = getCoins($connect, $email) - getHeroById($connect, $email, $id_hero)["price"];
+    //var_dump($coins);
+
+    updateUserCoins($connect, $email, $coins);
+
 }
 function updateUserCoins(mysqli $connect, string $email,int $coins):void
 {

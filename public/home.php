@@ -55,6 +55,18 @@ check_login();
         game.EFFECTS.push(Effect.convertObj(objsTmp[i]));
     }
 
+    sessionStorage.setItem('curr_hero_id', <?php
+        if (isset($_SESSION[SESSION_HOME_CURR_HERO]))
+        {
+            echo $_SESSION[SESSION_HOME_CURR_HERO];
+        }
+        else
+        {
+            echo 0;
+        }
+        $_SESSION[SESSION_HOME_CURR_HERO] = null;
+        ?>);
+
 </script>
 <section class="vh-100 bg-image">
     <!-- Navbar -->
@@ -159,10 +171,12 @@ check_login();
     </div>
 
     <div class="container">
-        <button id="btn-play" type="button">
+        <form id="form-btn" method="post" action="">
+            <button id="btn-play" type="submit" name="hero_id">
                 <b style="width: 55%;color: white;margin: auto; font-size: 180%">500</b>
                 <img style="width: 40%; height: 40%;padding-left: 2%; margin: auto;" src="assets/images/icons/coin_icon.png" alt="coins">
-        </button>
+            </button>
+        </form>
     </div>
 </section>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.umd.min.js"></script>

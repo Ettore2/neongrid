@@ -6,7 +6,17 @@ const card1 = document.getElementById('hero-card-1');
 const card2 = document.getElementById('hero-card-2');
 const card3 = document.getElementById('hero-card-3');
 const btn = document.getElementById('btn-play');
-let heroIndex = 0;
+let heroIndex = parseInt(sessionStorage.getItem('curr_hero_id'));
+{
+    let found = false;
+    for(let i = 0; i < HEROES.length && !found; i++){
+        if(HEROES[i].id === heroIndex){
+            found = true;
+            heroIndex = i;
+        }
+    }
+}
+
 document.getElementById("coins-text").innerText = game.COINS;
 
 //console.log(HEROES);
@@ -58,6 +68,7 @@ function updateCards(){
             {
                 btn.classList.toggle('animation-hover', false);
                 btn.style.background = '#FF0000';
+                btn.disabled = true;
             }
             else
             {
@@ -86,6 +97,8 @@ function setCardAttribute(card, hero){
 
     elements = elements[2].children;
     //console.log(elements);
+    //console.log(hero.active());
+    //console.log(hero);
 
     elements[0].innerHTML = "hp: " + hero.health;
     elements[1].innerHTML = "active: " + hero.active().name;
@@ -93,14 +106,13 @@ function setCardAttribute(card, hero){
     elements[3].innerHTML = "passive: " + hero.passive().name;
     elements[4].innerHTML = hero.passive().description;
 
-    //console.log(hero.active());
-    //console.log(hero);
 }
 
 function play()
 {
     //console.log("play");
-    sessionStorage.setItem('hero',HEROES[heroIndex]);
+    btn.value = HEROES[heroIndex].id;
+    document.getElementById("form-btn").action = "game.php";
 }
 
 function buy() {
@@ -115,8 +127,9 @@ function buy() {
      **/
 
     if (game.COINS < HEROES[heroIndex].price) {
-        console.log('Blocks');
+        //console.log('Blocks');//debug
         return;
     }
-    console.log('Yay');
+    btn.value = HEROES[heroIndex].id;
+    document.getElementById("form-btn").action = "buy_hero.php";
 }
