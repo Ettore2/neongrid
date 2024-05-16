@@ -1,0 +1,47 @@
+/*
+Clean Pool Blue: RGB(89, 203, 232)
+Maldives: RGB(0, 188, 225)
+Pink Bite: RGB(233, 60, 172)
+Sapphire Splendour: RGB(30, 34, 170)
+Shadow Planet: RGB(32, 21, 71)
+Midnight Dreams: RGB(5, 28, 44)
+*/
+
+.background-color-1
+{
+    background: rgba(89, 203, 232, 0.5);
+}
+.background-color-2
+{
+    background: rgb(0, 188, 225);
+}
+.background-color-3
+{
+    background: rgb(233, 60, 172);
+}
+.background-color-4
+{
+    background: rgb(30, 34, 170);
+}
+.background-color-5
+{
+    background: rgb(32, 21, 71);
+}
+.background-color-6
+{
+    background: rgb(5, 28, 44);
+}
+
+.background-color-7
+{
+    background: rgb(20, 4, 47);
+}
+
+.text-color-1
+{
+    color: rgb(255, 241, 0);
+}
+.text-color-2
+{
+    color: rgb(20, 4, 47);
+}

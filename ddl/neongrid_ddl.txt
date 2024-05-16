@@ -1,0 +1,132 @@
+create DATABASE neongrid;
+use neongrid;
+
+CREATE TABLE Have_Effect
+(
+    id int(10) NOT NULL AUTO_INCREMENT,
+    id_effect int(10) NOT NULL,
+    id_object int(10) NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE TABLE version
+(
+    id int(10) NOT NULL AUTO_INCREMENT,
+    description varchar(10) NOT NULL unique,
+    PRIMARY KEY (id)
+);
+CREATE TABLE Object
+(
+    id int(10) NOT NULL AUTO_INCREMENT,
+    id_type int(10) NOT NULL,
+    name varchar(50) NOT NULL UNIQUE,
+    health int(10) NOT NULL,
+    uses int(10),
+    img varchar(100) NOT NULL,
+    spawn_indicator int(10) NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE TABLE Run
+(
+    id int(10) NOT NULL AUTO_INCREMENT,
+    id_user int(10) NOT NULL,
+    id_hero int(10) NOT NULL,
+    turns int(10) NOT NULL,
+    coins int(10) NOT NULL,
+    dt_submit timestamp NOT NULL default CURRENT_TIMESTAMP,
+    duration int(10) NOT NULL,
+    id_version int(10) NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE TABLE Type
+(
+    id int(10) NOT NULL AUTO_INCREMENT,
+    description varchar(50) NOT NULL unique,
+    spawn_rate int(10) NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE TABLE have_hero
+(
+    id int(10) NOT NULL AUTO_INCREMENT,
+    id_user int(10) NOT NULL,
+    id_hero int(10) NOT NULL,
+    PRIMARY KEY (id)
+);
+CREATE TABLE `User`
+(
+    id int(10) NOT NULL AUTO_INCREMENT,
+    username varchar(50) NOT NULL,
+    email varchar(100) NOT NULL UNIQUE,
+    password varchar(255) NOT NULL,
+    coins int(10) default 500,
+    PRIMARY KEY (id)
+);
+CREATE TABLE `effect`
+(
+    id int(10) NOT NULL AUTO_INCREMENT,
+    name varchar(20) NOT NULL UNIQUE,
+    description varchar(50) NOT NULL,
+    value int(10) not null,
+    cd int(10) not null,
+    PRIMARY KEY (id)
+);
+CREATE table have_price (
+    id int AUTO_INCREMENT,
+    id_object int not null,
+    id_price int not null,
+    PRIMARY KEY (id)
+);
+
+CREATE table price (
+    id int AUTO_INCREMENT,
+    value int not null,
+    PRIMARY KEY (id)
+);
+
+
+ALTER TABLE have_hero ADD CONSTRAINT FKUnlocked_C500891 FOREIGN KEY (id_user) REFERENCES User (id);
+ALTER TABLE have_hero ADD CONSTRAINT FKUnlocked_C248673 FOREIGN KEY (id_hero) REFERENCES object (id);
+ALTER TABLE Object ADD CONSTRAINT FKObject44650 FOREIGN KEY (id_type) REFERENCES Type (id);
+ALTER TABLE Have_Effect ADD CONSTRAINT FKEffect_Obj913380 FOREIGN KEY (id_object) REFERENCES Object (id);
+ALTER TABLE Have_Effect ADD CONSTRAINT FKRHave_Effect838876 FOREIGN KEY (id_effect) REFERENCES `effect` (id);
+ALTER TABLE Run ADD CONSTRAINT FKRun588439 FOREIGN KEY (id_user) REFERENCES `User` (id);
+ALTER TABLE Run ADD CONSTRAINT FKRun838874 FOREIGN KEY (id_hero) REFERENCES `object` (id);
+ALTER TABLE Run ADD CONSTRAINT FKRun838875 FOREIGN KEY (id_version) REFERENCES `version` (id);
+ALTER TABLE have_price ADD CONSTRAINT FKHave_price838874 FOREIGN KEY (id_object) REFERENCES `object` (id);
+ALTER TABLE have_price ADD CONSTRAINT FKHave_price838875 FOREIGN KEY (id_price) REFERENCES `price` (id);
+
+
+
+INSERT into user (username, email, password) VALUES
+("marco","marco@gmail.com","$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K"),
+("mario","mario@gmail.com","$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K");
+
+INSERT into type (description, spawn_rate) VALUES
+("hero",0),("enemy",33),("object",16),("interactable",15),("weapon",25),("trap",10);
+
+INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
+("normie",10,null,"normie.jpeg",1,1),
+("tank",15,null,"tank.jpeg",1,1),
+("speedy",6,null,"speedy.jpeg",1,1),
+("warrior",8,null,"warrior.jpeg",1,1);
+
+INSERT into effect (name, description, value, cd) VALUES
+("corrosion resistance","corrosion stops at 3 hp",3,0),
+("pocket knife","gain a 4*1 knife",4,6),
+("beefed out","potions cure 2 hp extra",2,0),
+("upgrade","increase by 1 the power of all adjacent cells",1,7),
+("agile","immune to traps",0,0),
+("swap","change place with an adjacent cell",0,3),
+("furious","do not consume the weapon on a kill",0,0),
+("critical hit","the next attack deal 2x damage",2,7);
+
+INSERT into have_effect (id_object, id_effect) VALUES
+(1,1),(1,2),(2,3),(2,4),(3,5),(3,6),(4,7),(4,8);
+
+INSERT into price (value) VALUES
+(500),(600),(700);
+
+INSERT into have_price (id_object,id_price) VALUES
+(1,1),(2,1),(3,1),(4,3);
+
+INSERT into have_hero (id_user, id_hero) VALUES
+(1,1),(1,2),(1,4),(2,2),(2,3)
