@@ -15,6 +15,10 @@ require_once ('../includes/session.php');
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
         <link href="css/colors.css" rel="stylesheet" type="text/css">
         <link href="css/fonts.css" rel="stylesheet" type="text/css">
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Jacquard+12&family=Jersey+10&display=swap" rel="stylesheet">
     </head>
 <body style="background-image: url('assets/images/backgrounds/bgRegister.jpg'); background-repeat: no-repeat; background-size: cover;">
 <section class="vh-100 bg-image">
