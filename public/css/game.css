@@ -1,0 +1,98 @@
+#header
+{
+    display: flex;
+}
+#div-turns
+{
+    width: 40%;
+    border: 3px solid rgba(255, 255, 255, 0.91);
+    margin: 1% auto 1% 1%;
+    background-color: rgba(251, 251, 251, 0.42);
+    padding: 0.5% 0.3% 0.5% 0.3%;
+    display: flex;
+    border-radius: 10px;
+}
+#turns-text
+{
+    width: 69%;
+    margin: auto auto auto auto;
+    font-size: 200%;
+    text-align: center;
+    font-weight: bold;
+    padding: 0;
+}
+#div-coins
+{
+    width: 60%;
+    border: 3px solid rgba(255, 255, 255, 0.91);
+    margin: 1% 1% 1% auto;
+    background-color: rgba(251, 251, 251, 0.42);
+    padding: 0.5% 0.3% 0.5% 0.3%;
+    display: flex;
+    border-radius: 10px;
+}
+#coins-text
+{
+    width: 69%;
+    margin: auto 0 auto auto;
+    font-size: 200%;
+    text-align: right;
+    font-weight: bold;
+    padding-right: 2%;
+}
+#coin
+{
+    width: 30%;
+    margin: auto 0 auto 0;
+}
+#container-game
+{
+    width: 100%;
+}
+#weapon-card
+{
+
+    margin: 30% auto 0 auto;
+    width: 40%;
+}
+#hover-card
+{
+
+    margin: 20% auto 0 auto;
+    width: 80%;
+}
+#active-btn
+{
+
+    margin: 10% auto 0 auto;
+    width: 40%;
+}
+#weapon-name-img
+{
+    width: 100%;
+}
+#weapon-info
+{
+    color:white;
+}
+.card-name
+{
+    font-weight: bold;
+}
+.card-health
+{
+    margin-bottom: 0;
+}
+.card-effect-uses
+{
+
+}
+.card-ability-name
+{
+    margin-bottom: 0;
+}
+.card-ability-descr
+{
+    margin-bottom: 0;
+    font-size: 80%;
+}

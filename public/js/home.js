@@ -104,7 +104,7 @@ function setCardAttribute(card, hero){
 
     elements[0].innerHTML = "hp: " + hero.health;
     elements[1].innerHTML = "active: " + hero.active().name;
-    elements[2].innerHTML = hero.active().description;
+    elements[2].innerHTML = hero.active().description + ". cd: " + hero.active().cd;
     elements[3].innerHTML = "passive: " + hero.passive().name;
     elements[4].innerHTML = hero.passive().description;
 
