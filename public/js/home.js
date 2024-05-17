@@ -7,6 +7,7 @@ const card2 = document.getElementById('hero-card-2');
 const card3 = document.getElementById('hero-card-3');
 const btn = document.getElementById('btn-play');
 let heroIndex = parseInt(sessionStorage.getItem('curr_hero_id'));
+console.log(parseInt(sessionStorage.getItem('curr_hero_id')));
 {
     let found = false;
     for(let i = 0; i < HEROES.length && !found; i++){
@@ -16,6 +17,7 @@ let heroIndex = parseInt(sessionStorage.getItem('curr_hero_id'));
         }
     }
 }
+console.log(heroIndex);
 
 document.getElementById("coins-text").innerText = game.COINS;
 

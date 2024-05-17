@@ -62,7 +62,7 @@ check_login();
         }
         else
         {
-            echo 0;
+            echo 1;
         }
         $_SESSION[SESSION_HOME_CURR_HERO] = null;
         ?>);

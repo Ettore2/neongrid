@@ -270,18 +270,35 @@ function getHeroById(mysqli $connect, string $email, int $id_hero)
     return $hero;
 }
 
-function purchaseHero(mysqli $connect, string $email, int $id_hero):void
+function purchaseHero(mysqli $connect, string $email, int $id_hero):bool
 {
-    $id_user = getUserIdFromEmail($connect,$email);
-    $sql = "INSERT INTO have_hero (id_user, id_hero) values (?,?)";
-    $stmt = $connect->prepare($sql);
-    $stmt->bind_param("ii", $id_user, $id_hero);
-    $stmt->execute();
+    CONN->begin_transaction();
+    try {
 
-    $coins = getCoins($connect, $email) - getHeroById($connect, $email, $id_hero)["price"];
-    //var_dump($coins);
+        $id_user = getUserIdFromEmail($connect,$email);
+        $sql = "INSERT INTO have_hero (id_user, id_hero) values (?,?)";
+        $stmt = $connect->prepare($sql);
+        $stmt->bind_param("ii", $id_user, $id_hero);
+        $stmt->execute();
 
-    updateUserCoins($connect, $email, $coins);
+        $coins = getCoins($connect, $email) - getHeroById($connect, $email, $id_hero)["price"];
+        //var_dump($coins);
+
+        updateUserCoins($connect, $email, $coins);
+
+        // Commit transaction
+        CONN->commit();
+        //echo "Transaction successfully completed.";
+    } catch (Exception $e) {
+        // Rollback on failure
+        CONN->rollback();
+
+        return false;
+
+        $_SESSION[SESSION_WARNING] = ERROR_COULD_NOT_BUY_ITEM;
+    }
+
+    return true;
 
 }
 function updateUserCoins(mysqli $connect, string $email,int $coins):void
