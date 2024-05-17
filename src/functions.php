@@ -113,8 +113,7 @@ function getHeroes(mysqli $connect, $email):array
     $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator as enabled,value as price, have_hero.id as owned
             FROM object 
             join type on object.id_type = type.id
-            join have_price on object.id = have_price.id_object
-            join price on have_price.id_price = price.id
+            join price on price.id = object.id_price
             left join user on 1 left JOIN have_hero on object.id = have_hero.id_hero and user.id = have_hero.id_user
             where type.description = 'hero' and user.email = ?";
     $stmt = $connect->prepare($sql);
@@ -230,8 +229,7 @@ function getHeroById(mysqli $connect, string $email, int $id_hero)
     $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator as enabled,value as price, have_hero.id as owned
             FROM object 
             join type on object.id_type = type.id
-            join have_price on object.id = have_price.id_object
-            join price on have_price.id_price = price.id
+            join price on price.id = object.id_price
             left join user on 1 left JOIN have_hero on object.id = have_hero.id_hero and user.id = have_hero.id_user
             where type.description = 'hero' and user.email = ? and object.id = ?";
     $stmt = $connect->prepare($sql);

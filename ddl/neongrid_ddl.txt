@@ -18,6 +18,7 @@ CREATE TABLE Object
 (
     id int(10) NOT NULL AUTO_INCREMENT,
     id_type int(10) NOT NULL,
+    id_price int default null,
     name varchar(50) NOT NULL UNIQUE,
     health int(10) NOT NULL,
     uses int(10),
@@ -69,12 +70,6 @@ CREATE TABLE `effect`
     cd int(10) not null,
     PRIMARY KEY (id)
 );
-CREATE table have_price (
-    id int AUTO_INCREMENT,
-    id_object int not null,
-    id_price int not null,
-    PRIMARY KEY (id)
-);
 
 CREATE table price (
     id int AUTO_INCREMENT,
@@ -91,23 +86,27 @@ ALTER TABLE Have_Effect ADD CONSTRAINT FKRHave_Effect838876 FOREIGN KEY (id_effe
 ALTER TABLE Run ADD CONSTRAINT FKRun588439 FOREIGN KEY (id_user) REFERENCES `User` (id);
 ALTER TABLE Run ADD CONSTRAINT FKRun838874 FOREIGN KEY (id_hero) REFERENCES `object` (id);
 ALTER TABLE Run ADD CONSTRAINT FKRun838875 FOREIGN KEY (id_version) REFERENCES `version` (id);
-ALTER TABLE have_price ADD CONSTRAINT FKHave_price838874 FOREIGN KEY (id_object) REFERENCES `object` (id);
-ALTER TABLE have_price ADD CONSTRAINT FKHave_price838875 FOREIGN KEY (id_price) REFERENCES `price` (id);
+ALTER TABLE object ADD CONSTRAINT FKObject838874 FOREIGN KEY (id_price) REFERENCES `price` (id);
 
 
+
+INSERT into user (username, email, password,coins) VALUES
+("marco","marco@gmail.com","$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K",9999999);
 
 INSERT into user (username, email, password) VALUES
-("marco","marco@gmail.com","$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K"),
 ("mario","mario@gmail.com","$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K");
+
+INSERT into price (value) VALUES
+(500),(600),(700);
 
 INSERT into type (description, spawn_rate) VALUES
 ("hero",0),("enemy",33),("object",16),("interactable",15),("weapon",25),("trap",10);
 
-INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
-("normie",10,null,"normie.jpeg",1,1),
-("tank",15,null,"tank.jpeg",1,1),
-("speedy",6,null,"speedy.jpeg",1,1),
-("warrior",8,null,"warrior.jpeg",1,1);
+INSERT into object (name,health,uses,img,id_type,spawn_indicator,id_price) VALUES
+("normie",10,null,"normie.jpeg",1,1,1),
+("tank",15,null,"tank.jpeg",1,1,1),
+("speedy",6,null,"speedy.jpeg",1,1,1),
+("warrior",8,null,"warrior.jpeg",1,1,3);
 
 INSERT into effect (name, description, value, cd) VALUES
 ("corrosion resistance","corrosion stops at 3 hp",3,0),
@@ -122,11 +121,6 @@ INSERT into effect (name, description, value, cd) VALUES
 INSERT into have_effect (id_object, id_effect) VALUES
 (1,1),(1,2),(2,3),(2,4),(3,5),(3,6),(4,7),(4,8);
 
-INSERT into price (value) VALUES
-(500),(600),(700);
-
-INSERT into have_price (id_object,id_price) VALUES
-(1,1),(2,1),(3,1),(4,3);
 
 INSERT into have_hero (id_user, id_hero) VALUES
 (1,1),(1,2),(1,4),(2,2),(2,3)
