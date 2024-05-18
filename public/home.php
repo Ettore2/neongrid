@@ -36,24 +36,31 @@ check_login();
 </head>
 <body style="background-image: url('assets/images/backgrounds/bghome.jpg'); background-repeat: no-repeat; background-size: cover;">
 <script type="module">
-
     import {Effect, Hero, GameInstance} from "./js/gameClasses.js";
-    const game = GameInstance.getInstance();
-    game.COINS = <?=getCoins(CONN, $_SESSION[SESSION_EMAIL])?>;
-    //game.COINS = 0;//debug
 
+
+    const game = GameInstance.getInstance();
+
+    //get coins
+    game.COINS = <?=getCoins(CONN, $_SESSION[SESSION_EMAIL])?>;
+
+    //get heroes
     let objsTmp = <?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>;
     //console.log(objsTmp);
     for(let i = 0; i < objsTmp.length; i++)
     {
         game.HEROES.push(Hero.convertObj(objsTmp[i]));
     }
+    //console.log(game.HEROES);
 
+    //get effects
     objsTmp = <?php echo (json_encode(getEffects(CONN))); ?>;
     //console.log(objsTmp);
     for(let i = 0; i < objsTmp.length; i++){
         game.EFFECTS.push(Effect.convertObj(objsTmp[i]));
     }
+    //console.log(game.EFFECTS);
+
 
     sessionStorage.setItem('curr_hero_id', <?php
         if (isset($_SESSION[SESSION_HOME_CURR_HERO]))
@@ -116,21 +123,15 @@ check_login();
             <button id="btn_previous" style="width: 100%; height: 40%;"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
             <div style="width: 100%; height: 30%;"></div>
         </div>
-        <!-- hero -->
+        <!-- heroes -->
+        <?php
+        $types = getTypes(CONN);
+        $color_bg = $types[0]["color_bg"];
+        $color_bd = $types[0]["color_bd"];
+        ?>
         <div class="col-10">
-            <div class="row"style="margin: auto">
-                <div id="hero-card-1" style="scale: 80%;" class="card-hero card">
-                    <p class="card-name">normie</p>
-                    <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Palm Springs Road"/>
-                    <div class="div-card-info card-body">
-                        <p class="card-health">hp: 7</p>
-                        <p class="card-effect-name">active:</p>
-                        <p class="card-effect-descr">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
-                        <p class="card-effect-name">passive:</p>
-                        <p class="card-effect-descr">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
-                    </div>
-                </div>
-                <div id="hero-card-2" style="" class="card-hero card">
+            <div class="row" style="margin: auto">
+                <div id="hero-card-1" style="scale: 80%;opacity: 0.6;background-color: <?=$color_bg?>;border-color: <?=$color_bd?>" class="card-hero card">
                     <p class="card-name">normie</p>
                     <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Palm Springs Road"/>
                     <div class="card-body">
@@ -138,10 +139,10 @@ check_login();
                         <p class="card-effect-name">active:</p>
                         <p class="card-effect-descr">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
                         <p class="card-effect-name">passive:</p>
-                        <p class="card-effect-descr">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
+                        <p class="card-effect-descr">pppppppppppppppppppppppppppppppppppppppppppppppp</p>
                     </div>
                 </div>
-                <div id="hero-card-3" style="scale: 80%" class="card-hero card">
+                <div id="hero-card-2" style="scale: 100%;background-color: <?=$color_bg?>;border-color: <?=$color_bd?>" class="card-hero card">
                     <p class="card-name">normie</p>
                     <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Palm Springs Road"/>
                     <div class="card-body">
@@ -149,7 +150,18 @@ check_login();
                         <p class="card-effect-name">active:</p>
                         <p class="card-effect-descr">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
                         <p class="card-effect-name">passive:</p>
+                        <p class="card-effect-descr">pppppppppppppppppppppppppppppppppppppppppppppppp</p>
+                    </div>
+                </div>
+                <div id="hero-card-3" style="scale: 80%;opacity: 0.6;background-color: <?=$color_bg?>;border-color: <?=$color_bd?>" class="card-hero card">
+                    <p class="card-name">normie</p>
+                    <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Palm Springs Road"/>
+                    <div class="card-body">
+                        <p class="card-health">hp: 7</p>
+                        <p class="card-effect-name">active:</p>
                         <p class="card-effect-descr">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</p>
+                        <p class="card-effect-name">passive:</p>
+                        <p class="card-effect-descr">pppppppppppppppppppppppppppppppppppppppppppppppp</p>
                     </div>
                 </div>
             </div>

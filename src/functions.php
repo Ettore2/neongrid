@@ -65,7 +65,7 @@ function getObjects(mysqli $connect):array
     $effects_field = "effects";
     $objects = array();
     $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator 
-            FROM object";
+            FROM object where id_type != 1";
     $stmt = $connect->prepare($sql);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -104,13 +104,13 @@ function getObjects(mysqli $connect):array
 
 
     return $objects;
-}
+}//do not take heroes
 function getHeroes(mysqli $connect, $email):array
 {
     //need the cast type (by default they are strings)
     $effects_field = "effects";
     $heroes = array();
-    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator as enabled,value as price, have_hero.id as owned
+    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,value as price, have_hero.id as owned
             FROM object 
             join type on object.id_type = type.id
             join price on price.id = object.id_price
@@ -129,7 +129,7 @@ function getHeroes(mysqli $connect, $email):array
         $row["id"] = (int)$row["id"];
         $row["id_type"] = (int)$row["id_type"];
         $row["health"] = (int)$row["health"];
-        $row["enabled"] = $row["enabled"] != 0;
+        $row["spawn_indicator"] = (int)$row["spawn_indicator"];
         $row["price"] = (int)$row["price"];
         $row["owned"] = $row["owned"] !== null;
         $heroes[] = $row;
@@ -190,13 +190,13 @@ function getTypes(mysqli $connect): array
     $result = $stmt->get_result();
     while (($row = $result->fetch_assoc()) != null){
         $row["id"] = (int)$row["id"];
+        $row["spawn_rate"] = (int)$row["spawn_rate"];
         $return[] = $row;
     }
 
     return $return;
 }
-
-function getCoins(mysqli $connect, string $email)
+function getCoins(mysqli $connect, string $email): int
 {
     $sql = "SELECT coins FROM user WHERE email = ?";
     $stmt = $connect->prepare($sql);
@@ -222,11 +222,11 @@ function getPrices(mysqli $connect):array
     return $return;
 }
 
-function getHeroById(mysqli $connect, string $email, int $id_hero)
+function getHeroById(mysqli $connect, string $email, int $id_hero): array
 {
     //need the cast type (by default they are strings)
     $effects_field = "effects";
-    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator as enabled,value as price, have_hero.id as owned
+    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,value as price, have_hero.id as owned
             FROM object 
             join type on object.id_type = type.id
             join price on price.id = object.id_price
@@ -242,7 +242,7 @@ function getHeroById(mysqli $connect, string $email, int $id_hero)
     $row["id"] = (int)$row["id"];
     $row["id_type"] = (int)$row["id_type"];
     $row["health"] = (int)$row["health"];
-    $row["enabled"] = $row["enabled"] != 0;
+    $row["spawn_indicator"] = (int)$row["spawn_indicator"];
     $row["price"] = (int)$row["price"];
     $row["owned"] = $row["owned"] !== null;
 
@@ -274,28 +274,33 @@ function purchaseHero(mysqli $connect, string $email, int $id_hero):bool
 {
     CONN->begin_transaction();
     try {
-
-        $id_user = getUserIdFromEmail($connect,$email);
-        $sql = "INSERT INTO have_hero (id_user, id_hero) values (?,?)";
-        $stmt = $connect->prepare($sql);
-        $stmt->bind_param("ii", $id_user, $id_hero);
-        $stmt->execute();
-
         $coins = getCoins($connect, $email) - getHeroById($connect, $email, $id_hero)["price"];
-        //var_dump($coins);
+        if($coins >= 0){
+            updateUserCoins($connect, $email, $coins);
 
-        updateUserCoins($connect, $email, $coins);
+            $id_user = getUserIdFromEmail($connect,$email);
+            $sql = "INSERT INTO have_hero (id_user, id_hero) values (?,?)";
+            $stmt = $connect->prepare($sql);
+            $stmt->bind_param("ii", $id_user, $id_hero);
+            $stmt->execute();
 
-        // Commit transaction
-        CONN->commit();
-        //echo "Transaction successfully completed.";
+            // Commit transaction
+            CONN->commit();
+        }else{
+
+            // Commit transaction
+            CONN->commit();
+            return false;
+        }
+
     } catch (Exception $e) {
         // Rollback on failure
         CONN->rollback();
+        $_SESSION[SESSION_WARNING] = ERROR_COULD_NOT_BUY_ITEM;
 
         return false;
 
-        $_SESSION[SESSION_WARNING] = ERROR_COULD_NOT_BUY_ITEM;
+
     }
 
     return true;

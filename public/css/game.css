@@ -49,23 +49,30 @@
 {
     width: 100%;
 }
+.game-card{
+    border-width: 3px !important;
+    cursor: pointer;
+}
 #weapon-card
 {
-
+    border-width: 3px !important;
     margin: 30% auto 0 auto;
     width: 40%;
+    scale: 160%;
 }
 #hover-card
 {
-
-    margin: 20% auto 0 auto;
-    width: 80%;
+    border-width: 3px !important;
+    margin: 40% auto 0 auto;
+    width: 50%;
+    scale: 160%;
 }
 #active-btn
 {
-
-    margin: 10% auto 0 auto;
+    border-width: 3px !important;
+    margin: 50% auto 0 auto;
     width: 40%;
+    scale: 160%;
 }
 #weapon-name-img
 {

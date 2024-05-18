@@ -19,7 +19,7 @@ CREATE TABLE Object
     id int(10) NOT NULL AUTO_INCREMENT,
     id_type int(10) NOT NULL,
     id_price int default null,
-    name varchar(50) NOT NULL UNIQUE,
+    name varchar(50) NOT NULL,
     health int(10) NOT NULL,
     uses int(10),
     img varchar(100) NOT NULL,
@@ -43,6 +43,8 @@ CREATE TABLE Type
     id int(10) NOT NULL AUTO_INCREMENT,
     description varchar(50) NOT NULL unique,
     spawn_rate int(10) NOT NULL,
+    color_bg varchar(7) NOT NULL,
+    color_bd varchar(7) NOT NULL,
     PRIMARY KEY (id)
 );
 CREATE TABLE have_hero
@@ -99,14 +101,19 @@ INSERT into user (username, email, password) VALUES
 INSERT into price (value) VALUES
 (500),(600),(700);
 
-INSERT into type (description, spawn_rate) VALUES
-("hero",0),("enemy",33),("object",16),("interactable",15),("weapon",25),("trap",10);
+INSERT into type (description, spawn_rate, color_bg, color_bd) VALUES
+("hero",0,"#fff9b3","#fff200"),
+("enemy",33,"#c3c3c3","#717171"),
+("item",17,"#aaff92","#40ff00"),
+("interactable",15,"#dda6ff","#a100ff"),
+("weapon",25,"#8fa8ff","#0031ff"),
+("trap",10,"#dca969","#d56900");
 
-INSERT into object (name,health,uses,img,id_type,spawn_indicator,id_price) VALUES
-("normie",10,null,"normie.jpeg",1,1,1),
-("tank",15,null,"tank.jpeg",1,1,1),
-("speedy",6,null,"speedy.jpeg",1,1,1),
-("warrior",8,null,"warrior.jpeg",1,1,3);
+INSERT into object (name,health,img,id_type,spawn_indicator,id_price) VALUES
+("normie",10,"normie.jpeg",1,1,1),
+("tank",15,"tank.jpeg",1,1,1),
+("speedy",6,"speedy.jpeg",1,1,1),
+("warrior",8,"warrior.jpeg",1,1,3);
 
 INSERT into effect (name, description, value, cd) VALUES
 ("corrosion resistance","corrosion stops at 3 hp",3,0),
@@ -121,6 +128,46 @@ INSERT into effect (name, description, value, cd) VALUES
 INSERT into have_effect (id_object, id_effect) VALUES
 (1,1),(1,2),(2,3),(2,4),(3,5),(3,6),(4,7),(4,8);
 
-
 INSERT into have_hero (id_user, id_hero) VALUES
-(1,1),(1,2),(1,4),(2,2),(2,3)
+(1,1),(1,2),(1,4),(2,2),(2,3);
+
+INSERT into object (name,health,img,id_type,spawn_indicator) VALUES
+("robot",5,"robot.jpeg",2,10),
+("drone",2,"drone.jpeg",2,7),
+("vandal",7,"vandal.jpeg",2,8),
+("cyber dog",4,"robotic_dog.jpeg",2,6),
+("toxic bot",8,"toxic_bot.jpeg",2,4),
+("mafioso",7,"cyber_mafioso.jpeg",2,7),
+("spiked bot",7,"spike_bot.jpeg",2,3),
+("stalker bot",12,"stalker_bot.jpeg",2,3);
+
+INSERT into object (name,health,img,id_type,spawn_indicator) VALUES
+("coins",5,"coin.jpeg",3,10),
+("coins",15,"coin.jpeg",3,5),
+("health bottle",3,"healing_potion.jpeg",3,8),
+("health bottle",5,"healing_potion.jpeg",3,4),
+("toxic vile",3,"corrosion_potion.jpeg",3,4),
+("toxic vile",5,"corrosion_potion.jpeg",3,2);
+
+
+INSERT into object (name,health,img,id_type,spawn_indicator) VALUES
+("toxic barrel",1,"toxic_barrel.jpeg",4,4),
+("box",1,"box.jpeg",4,10);
+
+INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
+("knife",3,3,"knife.jpeg",5,10),
+("katana",6,2,"katana.jpeg",5,7),
+("taser",2,5,"taser.jpeg",5,4),
+("pistol",5,3,"pistol.jpeg",5,3),
+("corrosive knife",2,1,"toxic_knife.jpeg",5,4),
+("corrosive pistol",3,2,"toxic_gun.jpeg",5,1),
+("laser sword",4,3,"laser_sword.jpeg",5,10),
+("shotgun",8,2,"knife.jpeg",5,4);
+
+INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
+("lasers",2,null,"lasers_on.jpeg",6,10),
+("lasers",2,null,"lasers_off.jpeg",6,10),
+("bomb",2,null,"bomb.jpeg",6,10),
+("toxic puddle",3,3,"toxic_puddle.jpeg",6,2),
+("",0,0,"empty.jpeg",6,0);
+

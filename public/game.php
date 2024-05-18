@@ -9,14 +9,6 @@ check_login();
 
 ?>
 
-
-<?php
-/*Page for start a run. Is a link for the other pages.*/
-require_once ('../includes/session.php');
-require_once ('../src/functions.php');
-require_once ('../config/connect.php');
-check_login();
-?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -47,10 +39,54 @@ check_login();
 
 </head>
 <body style="background-image: url('assets/images/backgrounds/bggame.jpg'); background-repeat: no-repeat; background-size: cover;">
+    <script type="module">
+        import {Type,Effect, Hero, GameInstance, GameObject} from "./js/gameClasses.js";
+        sessionStorage.setItem('curr_hero_id', <?=$_POST["hero_id"]?>);
+
+
+        const game = GameInstance.getInstance();
+
+        //get coins
+        game.COINS = 0;
+
+        //get heroes
+        let objsTmp = <?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>;
+        //console.log(objsTmp);
+        for(let i = 0; i < objsTmp.length; i++)
+        {
+            game.HEROES.push(Hero.convertObj(objsTmp[i]));
+        }
+        //console.log(game.HEROES);
+
+        //get effects
+        objsTmp = <?php echo (json_encode(getEffects(CONN))); ?>;
+        //console.log(objsTmp);
+        for(let i = 0; i < objsTmp.length; i++){
+            game.EFFECTS.push(Effect.convertObj(objsTmp[i]));
+        }
+       //console.log(game.EFFECTS);
+
+        //get objects
+        objsTmp = <?php echo (json_encode(getObjects(CONN))); ?>;
+        //console.log(objsTmp);
+        for(let i = 0; i < objsTmp.length; i++){
+            game.OBJECTS.push(GameObject.convertObj(objsTmp[i]));
+        }
+        //console.log(game.OBJECTS);
+
+        //get types
+        objsTmp = <?php echo (json_encode(getTypes(CONN))); ?>;
+        //console.log(objsTmp);
+        for(let i = 0; i < objsTmp.length; i++){
+            game.TYPES.push(Type.convertObj(objsTmp[i]));
+        }
+        //console.log(game.TYPES);
+    </script>
+
 <section class="vh-100 bg-image">
 
     <div id="container-game" class="container-fluid row">
-        <div id="card-user-info" class="col-3">
+        <div id="card-user-info" class="col-2">
             <!--turns, weapon,btn active-->
             <div id="div-turns" class="container text-center">
                     <p id="turns-text">9999</p>
@@ -70,15 +106,13 @@ check_login();
                 <p id="weapon-cd-text" style="margin: 0 auto;text-align: center;" class="card-health">7</p>
             </button>
         </div>
-        <div id="wrapper-game" class="col-6 container">
-            <br>
+        <div id="wrapper-game" class="col-7 container">
             <br>
             <div class="row">
-                <div class="col-3">
 
-                </div>
+                <div class="col-3"></div>
                 <div class="col-2">
-                    <div class="card">
+                    <div class="card game-card">
                         <p style="margin: 0 auto" class="card-name">normie</p>
                         <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Object image"/>
                         <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
@@ -88,7 +122,7 @@ check_login();
                     </div>
                 </div>
                 <div class="col-2">
-                    <div class="card">
+                    <div class="card game-card">
                         <p style="margin: 0 auto" class="card-name">normie</p>
                         <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Object image"/>
                         <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
@@ -98,7 +132,7 @@ check_login();
                     </div>
                 </div>
                 <div class="col-2">
-                    <div class="card">
+                    <div class="card game-card">
                         <p style="margin: 0 auto" class="card-name">normie</p>
                         <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Object image"/>
                         <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
@@ -107,17 +141,13 @@ check_login();
                         </div>
                     </div>
                 </div>
-                <div class="col-3">
-
-                </div>
+                <div class="col-3"></div>
             </div>
             <br>
             <div class="row">
-                <div class="col-3">
-
-                </div>
+                <div class="col-3"></div>
                 <div class="col-2">
-                    <div class="card">
+                    <div class="card game-card">
                         <p style="margin: 0 auto" class="card-name">normie</p>
                         <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Object image"/>
                         <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
@@ -127,7 +157,7 @@ check_login();
                     </div>
                 </div>
                 <div class="col-2">
-                    <div class="card">
+                    <div class="card game-card">
                         <p style="margin: 0 auto" class="card-name">normie</p>
                         <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Object image"/>
                         <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
@@ -137,7 +167,7 @@ check_login();
                     </div>
                 </div>
                 <div class="col-2">
-                    <div class="card">
+                    <div class="card game-card">
                         <p style="margin: 0 auto" class="card-name">normie</p>
                         <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Object image"/>
                         <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
@@ -146,17 +176,13 @@ check_login();
                         </div>
                     </div>
                 </div>
-                <div class="col-3">
-
-                </div>
+                <div class="col-3"></div>
             </div>
             <br>
             <div class="row">
-                <div class="col-3">
-
-                </div>
+                <div class="col-3"></div>
                 <div class="col-2">
-                    <div class="card">
+                    <div class="card game-card">
                         <p style="margin: 0 auto" class="card-name">normie</p>
                         <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Object image"/>
                         <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
@@ -166,7 +192,7 @@ check_login();
                     </div>
                 </div>
                 <div class="col-2">
-                    <div class="card">
+                    <div class="card game-card">
                         <p style="margin: 0 auto" class="card-name">normie</p>
                         <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Object image"/>
                         <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
@@ -176,7 +202,7 @@ check_login();
                     </div>
                 </div>
                 <div class="col-2">
-                    <div class="card">
+                    <div class="card game-card">
                         <p style="margin: 0 auto" class="card-name">normie</p>
                         <img src="assets/images/cards/normie.jpeg" class="card-img-top" alt="Object image"/>
                         <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
@@ -185,10 +211,9 @@ check_login();
                         </div>
                     </div>
                 </div>
-                <div class="col-3">
-
-                </div>
+                <div class="col-3"></div>
             </div>
+
         </div>
         <div id="card-object-info" class="col-3 container">
             <div id="div-coins" class="container text-center">
@@ -207,11 +232,11 @@ check_login();
                     <p id="hover-passive-descr-text" class="card-ability-descr">xxxxxxxxxxxx</p>
                 </div>
             </div>
-
         </div>
+
     </div>
     <div class="col-2">
-        <button style="margin-left: 1%; margin-bottom: 1%;z-index: 99999999999;position: fixed;bottom: 0;" id="quit-btn" class="btn btn-danger">Quit</button>
+        <button id="quit-btn" style="margin-left: 1%; margin-bottom: 1%;z-index: 99999999999;position: fixed;bottom: 0;" class="btn btn-danger">Quit</button>
     </div>
 </section>
 <script type="module" src="js/game.js"></script>

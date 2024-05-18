@@ -29,7 +29,7 @@ require_once ('../includes/session.php');
                     <div class="card background-color-1" style="border-radius: 15px;">
                         <div class="card-body p-5">
                             <h2 style="color: #080A0B" class="font-Cybergame text-uppercase text-center mb-5">Login!</h2>
-                            <form action="<?=htmlspecialchars($_SERVER['PHP_SELF']);// Another way to embed php code into a value for a html value parameter.?>" method="post">
+                            <form action="<?=htmlspecialchars($_SERVER['PHP_SELF']);?>" method="post">
                                 <div class="form-outline mb-4">
                                     <input type="email" name="email" id="email" class="form-control form-control-lg" maxlength="100" placeholder="Email" required/>
                                     <label class="form-label" for="email">Email</label>

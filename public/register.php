@@ -57,7 +57,6 @@ require_once ('../includes/session.php');
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </section>
 <?php
-//echo(password_hash("pp", PASSWORD_DEFAULT)."<br>");
 if ($_SERVER['REQUEST_METHOD'] === 'POST')
 {
     $username = $_POST['username'];

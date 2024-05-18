@@ -7,7 +7,7 @@ const card2 = document.getElementById('hero-card-2');
 const card3 = document.getElementById('hero-card-3');
 const btn = document.getElementById('btn-play');
 let heroIndex = parseInt(sessionStorage.getItem('curr_hero_id'));
-console.log(parseInt(sessionStorage.getItem('curr_hero_id')));
+//console.log(parseInt(sessionStorage.getItem('curr_hero_id')));
 {
     let found = false;
     for(let i = 0; i < HEROES.length && !found; i++){
@@ -17,15 +17,15 @@ console.log(parseInt(sessionStorage.getItem('curr_hero_id')));
         }
     }
 }
-console.log(heroIndex);
+//console.log(heroIndex);
 
 document.getElementById("coins-text").innerText = game.COINS;
 
-//console.log(HEROES);
+console.log(HEROES);
 //console.log(EFFECTS);
 
 
-updateCards()
+updateCards();
 
 document.getElementById('btn_next').addEventListener('click', () =>
 {
@@ -50,7 +50,7 @@ function updateCards(){
 
     let text = btn.children[0];
     let img  = btn.children[1];
-    if(HEROES[heroIndex].enabled){
+    if(HEROES[heroIndex].isEnabled()){
         btn.disabled = false;
         if(HEROES[heroIndex].owned){
             //btn play
@@ -92,7 +92,7 @@ function updateCards(){
  * @param {Hero} hero
  **/
 function setCardAttribute(card, hero){
-    let elements = card.children; //
+    let elements = card.children;
     //console.log(elements);
     elements[0].innerHTML =  hero.name;
     elements[1].src = "assets/images/cards/" + hero.img;
@@ -128,10 +128,9 @@ function buy() {
 
      **/
 
-    if (game.COINS < HEROES[heroIndex].price) {
-        //console.log('Blocks');//debug
+    if (game.COINS < HEROES[heroIndex].price)
         return;
-    }
+
     btn.value = HEROES[heroIndex].id;
     document.getElementById("form-btn").action = "buy_hero.php";
 }
