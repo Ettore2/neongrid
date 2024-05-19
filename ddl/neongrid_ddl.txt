@@ -66,10 +66,10 @@ CREATE TABLE `User`
 CREATE TABLE `effect`
 (
     id int(10) NOT NULL AUTO_INCREMENT,
-    name varchar(20) NOT NULL UNIQUE,
+    name varchar(20) NOT NULL,
     description varchar(50) NOT NULL,
-    value int(10) not null,
-    cd int(10) not null,
+    value int(10) default 0,
+    cd int(10) default 0,
     PRIMARY KEY (id)
 );
 
@@ -125,6 +125,23 @@ INSERT into effect (name, description, value, cd) VALUES
 ("furious","do not consume the weapon on a kill",0,0),
 ("critical hit","the next attack deal 2x damage",2,7);
 
+INSERT into effect (name, description, value) VALUES
+("shield","ignore the first damage taken",1),
+("revenge","destroy the weapon that kill him",0),
+("death puddle","spawn a toxic puddle on death",32),
+("corrosive touch","give poison when attacked",1),
+("wealthy","spawn coins when killed",13),
+("spikes","deal 1 damage back when attacked",1),
+("damage absorption","take 1 less damage from all sources except corrosion",1),
+("armed","spawn a weapon when killed",1),
+("laser trap activation","activate next turn",30),
+("laser trap deactivation","deactivate next turn",29),
+("detonation","when it dies it explodes dealing as much damage as its health to adjacent cells",4),
+("corrosive","give corrosion to the target",1),
+("temporary-3","expire after 3 turns",3),
+("temporary-4","expire after 4 turns",4),
+("toxins immunity","immune to corrosion",0);
+
 INSERT into have_effect (id_object, id_effect) VALUES
 (1,1),(1,2),(2,3),(2,4),(3,5),(3,6),(4,7),(4,8);
 
@@ -136,10 +153,10 @@ INSERT into object (name,health,img,id_type,spawn_indicator) VALUES
 ("drone",2,"drone.jpeg",2,7),
 ("vandal",7,"vandal.jpeg",2,8),
 ("cyber dog",4,"robotic_dog.jpeg",2,6),
-("toxic bot",8,"toxic_bot.jpeg",2,4),
+("toxic bot",8,"toxic_bot.jpeg",2,3),
 ("mafioso",7,"cyber_mafioso.jpeg",2,7),
 ("spiked bot",7,"spike_bot.jpeg",2,3),
-("stalker bot",12,"stalker_bot.jpeg",2,3);
+("stalker bot",12,"stalker_bot.jpeg",2,2);
 
 INSERT into object (name,health,img,id_type,spawn_indicator) VALUES
 ("coins",5,"coin.jpeg",3,10),
@@ -167,7 +184,10 @@ INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
 INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
 ("lasers",2,null,"lasers_on.jpeg",6,10),
 ("lasers",2,null,"lasers_off.jpeg",6,10),
-("bomb",2,null,"bomb.jpeg",6,10),
-("toxic puddle",3,3,"toxic_puddle.jpeg",6,2),
+("bomb",3,4,"bomb.jpeg",6,10),
+("toxic puddle",2,3,"toxic_puddle.jpeg",6,2),
 ("",0,0,"empty.jpeg",6,0);
+
+INSERT into have_effect (id_object, id_effect) VALUES
+(8,10),(9,11),(9,12),(10,13),(11,14),(12,15),(19,11),(20,16),(25,20),(26,20),(29,18),(30,19),(31,22),(32,21),(9,23);
 
