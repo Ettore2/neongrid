@@ -84,7 +84,7 @@ export class GameObject
         this._price = price;
         this._uses = uses;
 
-        this._alreadyDamaged = false;
+        this._shields = 0;
         this._maxHealth;
 
         if(id_type === 1 || id_type === 2){
@@ -149,9 +149,13 @@ export class GameObject
     {
         return this._maxHealth;
     }
-    get alreadyDamaged()
+    get shields()
     {
-        return this._alreadyDamaged;
+        return this._shields;
+    }
+    set shields(shields)
+    {
+        this._shields = shields;
     }
     // Methods
     isEnabled()
@@ -225,6 +229,9 @@ export class GameObject
             }
         }
         return false;
+    }
+    haveShields(){
+        return this.shields > 0;
     }
 
 }
@@ -405,7 +412,16 @@ export class GameCell
         if(this._obj.haveUses()){
             elements[1].innerHTML = "uses: " + this._obj.uses;
         }else{
-            elements[1].innerHTML = "<br>";
+            if(this.obj.haveShields()){
+                if(this.obj.shields > 1){
+                    elements[1].innerHTML = this.obj.shields +" x shields";
+                }else{
+                    elements[1].innerHTML = this.obj.shields +" x shield";
+                }
+            }else{
+                elements[1].innerHTML = "<br>";
+            }
+
         }
 
         let type = this.getType();
