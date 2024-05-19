@@ -43,23 +43,8 @@ check_login();
 
     //get coins
     game.COINS = <?=getCoins(CONN, $_SESSION[SESSION_EMAIL])?>;
-
-    //get heroes
-    let objsTmp = <?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>;
-    //console.log(objsTmp);
-    for(let i = 0; i < objsTmp.length; i++)
-    {
-        game.HEROES.push(Hero.convertObj(objsTmp[i]));
-    }
-    //console.log(game.HEROES);
-
-    //get effects
-    objsTmp = <?php echo (json_encode(getEffects(CONN))); ?>;
-    //console.log(objsTmp);
-    for(let i = 0; i < objsTmp.length; i++){
-        game.EFFECTS.push(Effect.convertObj(objsTmp[i]));
-    }
-    //console.log(game.EFFECTS);
+    game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>);
+    game.initializeEffects(<?php echo (json_encode(getEffects(CONN))); ?>)
 
 
     sessionStorage.setItem('curr_hero_id', <?php

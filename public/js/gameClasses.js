@@ -1,10 +1,10 @@
 export class GameInstance
 {
     constructor() {
-        this.HEROES = Array();
-        this.OBJECTS = Array();
-        this.EFFECTS = Array();
-        this.TYPES = Array();
+        this.HEROES = Array();//normal
+        this.OBJECTS = Array();//normal
+        this.EFFECTS = Array();//key val
+        this.TYPES = Array();//normal
         this.COINS = 0;
     }
     static getInstance() {
@@ -12,6 +12,46 @@ export class GameInstance
     }
 
     static #instance = new GameInstance();
+
+    // methods
+    initializeALl()
+    {
+        this.initializeHeroes();
+        this.initializeObjects();
+        this.initializeTypes();
+        this.initializeEffects();
+    }
+
+    initializeHeroes(obj)
+    {
+        //get heroes
+        for(let i = 0; i < obj.length; i++)
+        {
+            this.HEROES.push(Hero.convertObj(obj[i]));
+        }
+    }
+    initializeObjects(obj)
+    {
+        for(let i = 0; i < obj.length; i++)
+        {
+            this.OBJECTS.push(GameObject.convertObj(obj[i]));
+        }
+    }
+    initializeTypes(obj)
+    {
+        for(let i = 0; i < obj.length; i++)
+        {
+            this.TYPES.push(Type.convertObj(obj[i]));
+        }
+    }
+    initializeEffects(obj)
+    {
+        for(let i = 0; i < obj.length; i++)
+        {
+            let effect = Effect.convertObj(obj[i])
+            this.EFFECTS[effect.id] = effect;
+        }
+    }
 
 }
 
@@ -25,7 +65,7 @@ export class GameObject
      * @param {string} name
      * @param {number} health
      * @param {string} img
-     * @param {[Effect]} effects
+     * @param {[int]} effects
      * @param {int} spawn_indicator
      * @param {boolean} owned
      * @param {number} price
@@ -43,6 +83,15 @@ export class GameObject
         this._owned = owned;
         this._price = price;
         this._uses = uses;
+
+        this._alreadyDamaged = false;
+        this._maxHealth;
+
+        if(id_type === 1 || id_type === 2){
+            this._maxHealth = health;
+        }else{
+            this._maxHealth = -1;
+        }
     }
     static convertObj(obj)
     {
@@ -68,6 +117,10 @@ export class GameObject
     {
         return this._health;
     }
+    set health(health)
+    {
+        this._health = health;
+    }
     get img()
     {
         return this._img;
@@ -92,11 +145,47 @@ export class GameObject
     {
         return this._uses;
     }
+    get maxHealth()
+    {
+        return this._maxHealth;
+    }
+    get alreadyDamaged()
+    {
+        return this._alreadyDamaged;
+    }
     // Methods
     isEnabled()
     {
         return this._spawn_indicator > 0;
     }
+
+    // Method
+    active ()
+    {
+        let EFFECTS = GameInstance.getInstance().EFFECTS;
+
+        for(let i = 0; i < this.effects.length; i++){
+            if(EFFECTS[this.effects[i]].cd !== 0){
+                return EFFECTS[this.effects[i]];
+            }
+        }
+
+        return null;
+    }
+    passive ()
+    {
+        let EFFECTS = GameInstance.getInstance().EFFECTS;
+
+        for(let i = 0; i < this.effects.length; i++){
+            if(EFFECTS[this.effects[i]].cd === 0){
+                return EFFECTS[this.effects[i]];
+            }
+        }
+
+        return null;
+    }
+    /**
+     * @return Type **/
     getType(){
         let types = GameInstance.getInstance().TYPES;
 
@@ -106,11 +195,41 @@ export class GameObject
             }
         }
     }
+    cahHeal(){
+        return this.maxHealth > this.health || !this.getType().have_max_health;
+    }
+    heal(val){
+        this.health += val;
+        if(this.health > this.maxHealth && this.getType().have_max_health){
+            this.health = this.maxHealth
+        }
+    }
+    haveUses(){
+        return this.uses !== undefined && this.uses !== 0;
+    }
+    getPassives(){
+        let game = GameInstance.getInstance();
+        let result = Array();
+        for(let i = 0; i < this.effects.length; i++){
+            if(game.EFFECTS[this.effects[i]].cd === 0){
+                result.push(game.EFFECTS[this.effects[i]]);
+            }
+        }
+        return result;
+    }
+    havePassives(){
+        let game = GameInstance.getInstance();
+        for(let i = 0; i < this.effects.length; i++){
+            if(game.EFFECTS[this.effects[i]].cd === 0){
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
 export class Hero extends GameObject
 {
-
     /**
      *@constructor
      * @param {number} id
@@ -135,38 +254,6 @@ export class Hero extends GameObject
     static convertJSON(obj)
     {
         return new Hero(obj._id, obj._id_type, obj._name, obj._health, obj._img, obj._effects, obj._spawn_indicator, obj._owned, obj._price);
-    }
-    // Method
-
-    active ()
-    {
-        let EFFECTS = GameInstance.getInstance().EFFECTS;
-
-        for(let i = 0; i < EFFECTS.length; i++){
-            for(let j = 0; j < this.effects.length; j++){
-                if(EFFECTS[i].id === this.effects[j] && EFFECTS[i].cd !== 0){
-                    return EFFECTS[i];
-                }
-            }
-        }
-
-        console.log("null a")
-        return null;
-    }
-    passive ()
-    {
-        let EFFECTS = GameInstance.getInstance().EFFECTS;
-
-        for(let i = 0; i < EFFECTS.length; i++){
-            for(let j = 0; j < this.effects.length; j++){
-                if(EFFECTS[i].id === this.effects[j] && EFFECTS[i].cd === 0){
-                    return EFFECTS[i];
-                }
-            }
-        }
-
-        console.log("null p")
-        return null;
     }
 }
 export class Effect
@@ -230,42 +317,43 @@ export class Type
      * @param {int} spawn_rate
      * @param {string} color_bg
      * @param {string} color_bd
+     * @param {boolean} have_max_health
      * **/
-    constructor(id, description, spawn_rate, color_bg, color_bd)
+    constructor(id, description, spawn_rate, color_bg, color_bd,have_max_health)
     {
         this._id = id;
         this._description = description;
         this._spawn_rate = spawn_rate;
         this._color_bg = color_bg;
         this._color_bd = color_bd;
+        this._have_max_health = have_max_health;
     }
     static convertObj(obj)
     {
-        return new Type(obj.id, obj.description, obj.spawn_rate, obj.color_bg, obj.color_bd);
+        return new Type(obj.id, obj.description, obj.spawn_rate, obj.color_bg, obj.color_bd, obj.have_max_health);
     }
     static convertJSON(obj)
     {
-        return new Type(obj._id, obj._description, obj._spawn_rate, obj._color_bg, obj._color_bd);
+        return new Type(obj._id, obj._description, obj._spawn_rate, obj._color_bg, obj._color_bd, obj._have_max_health);
     }
 
     get id() {
         return this._id;
     }
-
     get description() {
         return this._description;
     }
-
     get spawn_rate() {
         return this._spawn_rate;
     }
-
     get color_bg() {
         return this._color_bg;
     }
-
     get color_bd() {
         return this._color_bd;
+    }
+    get have_max_health() {
+        return this._have_max_health;
     }
 }
 export class GameCell
@@ -301,18 +389,23 @@ export class GameCell
         //console.log(this._card.children);
 
         let elements = this._card.children;
-        elements[0].innerHTML =  this._obj.name;
-        elements[1].src = "assets/images/cards/" + this._obj.img;
+        elements[0].innerHTML =  this.obj.name;
+        elements[1].src = "assets/images/cards/" + this.obj.img;
 
         elements = elements[2].children;
 
 
-        elements[0].innerHTML = "hp: " + this._obj.health;
+        if(this.obj.getType().have_max_health){
+            elements[0].innerHTML = "hp: " + this._obj.health +"/"+this.obj.maxHealth;
+        }else{
+            elements[0].innerHTML = "hp: " + this._obj.health;
+        }
+        //console.log(this._obj);
 
-        if(this._obj.uses !== undefined && this._obj.uses !== 0){
+        if(this._obj.haveUses()){
             elements[1].innerHTML = "uses: " + this._obj.uses;
         }else{
-            elements[1].innerHTML = "uses: ";
+            elements[1].innerHTML = "<br>";
         }
 
         let type = this.getType();
@@ -320,8 +413,45 @@ export class GameCell
         this.card.style.borderColor = type.color_bd;
 
     }
+    graphicUpdatePlus(){
+        console.log(this.obj);
+        this.graphicUpdate();
+        let elements = this._card.children[2].children;
+        if(this.obj.id_type === 1){
+            elements[1].innerText = "";
+            elements[2].innerText = "active: " + this.obj.active().name;
+            elements[3].innerText = this.obj.active().description;
+            elements[4].innerText = "passive: " + this.obj.passive().name;
+            elements[5].innerText = this.obj.passive().description;
+        }else{
+            elements[2].innerText = "";
+            elements[3].innerText = "";
+            elements[4].innerText = "";
+            elements[5].innerText = "";
+            if(this.obj.havePassives()){
+                elements[1].innerText = "";
+                let passives = this.obj.getPassives();
+                let s = "";
+                for (let i = 0; i < passives.length; i++){
+                    if(i !== 0){
+                        s = s +", ";
+                    }
+                    s = s + passives[i].description;
+                }
+                elements[3].innerText = s;
+            }
+        }
+        /**/
+
+
+    }
     getType(){
         return this.obj.getType();
+    }
+    click(){
+        switch (this.obj.getType().id){
+
+        }
     }
 
 }

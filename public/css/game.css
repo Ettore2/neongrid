@@ -66,6 +66,9 @@
     margin: 40% auto 0 auto;
     width: 50%;
     scale: 160%;
+    opacity: 0;
+    transition-duration: 0.8s;
+    padding-bottom: 3%;
 }
 #active-btn
 {
@@ -97,9 +100,10 @@
 .card-ability-name
 {
     margin-bottom: 0;
+    font-size: 80%;
 }
 .card-ability-descr
 {
     margin-bottom: 0;
-    font-size: 80%;
+    font-size: 60%;
 }

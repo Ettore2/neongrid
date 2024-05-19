@@ -43,44 +43,14 @@ check_login();
         import {Type,Effect, Hero, GameInstance, GameObject} from "./js/gameClasses.js";
         sessionStorage.setItem('curr_hero_id', <?=$_POST["hero_id"]?>);
 
-
         const game = GameInstance.getInstance();
 
-        //get coins
         game.COINS = 0;
-
-        //get heroes
-        let objsTmp = <?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>;
-        //console.log(objsTmp);
-        for(let i = 0; i < objsTmp.length; i++)
-        {
-            game.HEROES.push(Hero.convertObj(objsTmp[i]));
-        }
-        //console.log(game.HEROES);
-
-        //get effects
-        objsTmp = <?php echo (json_encode(getEffects(CONN))); ?>;
-        //console.log(objsTmp);
-        for(let i = 0; i < objsTmp.length; i++){
-            game.EFFECTS.push(Effect.convertObj(objsTmp[i]));
-        }
-       //console.log(game.EFFECTS);
-
-        //get objects
-        objsTmp = <?php echo (json_encode(getObjects(CONN))); ?>;
-        //console.log(objsTmp);
-        for(let i = 0; i < objsTmp.length; i++){
-            game.OBJECTS.push(GameObject.convertObj(objsTmp[i]));
-        }
+        game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>);
+        game.initializeObjects(<?php echo (json_encode(getObjects(CONN))); ?>);
+        game.initializeTypes(<?php echo (json_encode(getTypes(CONN))); ?>);
+        game.initializeEffects(<?php echo (json_encode(getEffects(CONN))); ?>);
         //console.log(game.OBJECTS);
-
-        //get types
-        objsTmp = <?php echo (json_encode(getTypes(CONN))); ?>;
-        //console.log(objsTmp);
-        for(let i = 0; i < objsTmp.length; i++){
-            game.TYPES.push(Type.convertObj(objsTmp[i]));
-        }
-        //console.log(game.TYPES);
     </script>
 
 <section class="vh-100 bg-image">
@@ -109,7 +79,6 @@ check_login();
         <div id="wrapper-game" class="col-7 container">
             <br>
             <div class="row">
-
                 <div class="col-3"></div>
                 <div class="col-2">
                     <div class="card game-card">
@@ -222,9 +191,9 @@ check_login();
             </div>
             <div id="hover-card" class="card">
                 <p id="hover-name-text" style="margin: 0 auto" class="card-name">normie</p>
-                <img id="hover-name-img"  src="assets/images/cards/toxic_knife.jpeg" class="card-img-top" alt="Object image"/>
+                <img id="hover-img"  src="assets/images/cards/toxic_knife.jpeg" class="card-img-top" alt="Object image"/>
                 <div style="padding-top: 0; padding-bottom: 0;" class="card-body">
-                    <p id="hover-damage-text" style="margin-bottom: 0;" class="card-health">hp: 7</p>
+                    <p id="hover-health-text" style="margin-bottom: 0;" class="card-health">hp: 7</p>
                     <p id="hover-uses-text" class="card-effect-uses">uses: 2</p>
                     <p id="hover-active-name-text" class="card-ability-name">active: xxxx</p>
                     <p id="hover-active-descr-text" class="card-ability-descr">xxxxxxxxxxxx</p>

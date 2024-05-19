@@ -3,6 +3,7 @@ import {GameCell, GameInstance, GameObject} from "./gameClasses.js";
 const game = GameInstance.getInstance();
 const turnsText = document.querySelector('#turns-text');
 const coinsText = document.querySelector('#coins-text');
+const hoverGameCell = new GameCell(document.getElementById('hover-card'),null);
 //console.log(game.HEROES)
 //console.log(game.OBJECTS)
 //console.log(game.EFFECTS)
@@ -36,6 +37,8 @@ let gameGrid = [];
 
 const gameCards = document.querySelectorAll('.game-card');
 
+
+document.querySelector('#hover-card').style.opacity = 0;
 //initialize game cards
 for (let i = 0; i < gameCards.length; i++)
 {
@@ -48,17 +51,51 @@ for (let i = 0; i < gameCards.length; i++)
     });
     gameCards[i].addEventListener('mouseover', (e) =>
     {
-        //console.log('Hover');
+
+        //get the calling card
+        //console.log(card);
+        let classes = e.target.classList;
+        //console.log(classes);
+        let father = e.target;
+        if (classes.contains('card-name') || classes.contains('card-img-top') || classes.contains("card-body"))
+        {
+            father = e.target.parentElement;
+        }
+        else if (!classes.contains("game-card"))
+        {
+            father = e.target.parentElement.parentElement;
+        }
+        let elements = father.children;
+
+        //find the obj of the calling card
+        let objTmp = null;
+        for(let i = 0; i < gameGrid.length && objTmp === null; i++ ){
+            for(let j = 0; j < gameGrid[i].length && objTmp === null; j++ ){
+                if(gameGrid[i][j].card === father){
+                    objTmp = gameGrid[i][j].obj;
+                }
+            }
+        }
+
+        //compile hover card
+        hoverGameCell.obj = objTmp;
+        hoverGameCell.graphicUpdatePlus();
+
+        //change the visibility
+        let card = document.querySelector('#hover-card');
+        card.style.transitionDuration = "0.8s";
+        card.style.opacity = 1;
     });
     gameCards[i].addEventListener('mouseleave', (e) =>
     {
-        //console.log('Leave');
+        document.querySelector('#hover-card').style.transitionDuration = "0.5s";
+        document.querySelector('#hover-card').style.opacity = 0;
     });
     if(i === parseInt((rows*columns-1)/2)){
-
         gameGrid[parseInt(i/columns)].push(new GameCell(gameCards[i],hero));
     }else {
         let tmp = new GameCell(gameCards[i],createNewObject());
+        //console.log(tmp.obj);
         gameGrid[parseInt(i/columns)].push(tmp);
     }
 

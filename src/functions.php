@@ -64,7 +64,7 @@ function getObjects(mysqli $connect):array
     //need the cast type (by default they are strings)
     $effects_field = "effects";
     $objects = array();
-    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator 
+    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,object.uses
             FROM object where id_type != 1";
     $stmt = $connect->prepare($sql);
     $stmt->execute();
@@ -75,6 +75,7 @@ function getObjects(mysqli $connect):array
         $row["id_type"] = (int)$row["id_type"];
         $row["health"] = (int)$row["health"];
         $row["spawn_indicator"] = (int)$row["spawn_indicator"];
+        $row["uses"] = (int)$row["uses"];
         $row[$effects_field] = array();
         $objects[] = $row;
     }
@@ -191,6 +192,7 @@ function getTypes(mysqli $connect): array
     while (($row = $result->fetch_assoc()) != null){
         $row["id"] = (int)$row["id"];
         $row["spawn_rate"] = (int)$row["spawn_rate"];
+        $row["have_max_health"] = $row["have_max_health"] === 1;
         $return[] = $row;
     }
 
