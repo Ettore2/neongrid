@@ -6,8 +6,7 @@ const coinsText = document.querySelector('#coins-text');
 const hoverGameCell = new GameCell(document.getElementById('hover-card'),null);
 //console.log(game.HEROES)
 //console.log(game.OBJECTS)
-console.log(game.EFFECTS)
-console.log("??????????????????????????")
+//console.log(game.EFFECTS)
 //console.log(game.TYPES)
 //console.log(gameObjects)
 game.setPlayer(parseInt(sessionStorage.getItem("curr_hero_id")))
@@ -37,7 +36,7 @@ for (let i = 0; i < game.gameCards.length; i++)
             for(let x = 0; x < game.gameGrid.length; x++){
                 for(let y = 0; y < game.gameGrid[x].length; y++){
                     if(game.gameGrid[x][y].obj.is_corroded){
-                        game.gameGrid[x][y].obj.takeSpecialDamage(1);
+                        game.gameGrid[x][y].obj.takeSpecialDamage(null,1);
                         game.gameGrid[x][y].obj.executeEffects(7,this);//special damage taken
                     }
                 }
@@ -45,17 +44,17 @@ for (let i = 0; i < game.gameCards.length; i++)
 
             for(let x = 0; x < game.gameGrid.length; x++){
                 for(let y = 0; y < game.gameGrid[x].length; y++){
-                    this.executeEffects(12,this);//normal turn end
+                    game.gameGrid[x][y].obj.executeEffects(12,this);//normal turn end
                 }
             }
             for(let x = 0; x < game.gameGrid.length; x++){
                 for(let y = 0; y < game.gameGrid[x].length; y++){
-                    this.executeEffects(13,this);//normal turn start
+                    game.gameGrid[x][y].obj.executeEffects(13,this);//normal turn start
                 }
             }
             for(let x = 0; x < game.gameGrid.length; x++){
                 for(let y = 0; y < game.gameGrid[x].length; y++){
-                    this.executeEffects(16,this);//normal turn play
+                    game.gameGrid[x][y].obj.executeEffects(16,this);//normal turn play
                 }
             }
 

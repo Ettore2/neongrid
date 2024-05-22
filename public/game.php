@@ -48,10 +48,10 @@ check_login();
 
         game.coins = 0;
         //console.log("game.EFFECTS");
-        game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>);
-        game.initializeObjects(<?php echo (json_encode(getObjects(CONN))); ?>);
         game.initializeTypes(<?php echo (json_encode(getTypes(CONN))); ?>);
         game.initializeEffects(<?php echo (json_encode(getEffects(CONN))); ?>);
+        game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>);
+        game.initializeObjects(<?php echo (json_encode(getObjects(CONN))); ?>);
 
         //console.log(game.EFFECTS);
         //console.log("-----------------------------------");

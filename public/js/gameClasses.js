@@ -39,13 +39,11 @@ export class GameInstance
     //elaborate data from php
     initializeHeroes(obj)
     {
-        console.log("initializeHeroes");
         //get heroes
         for(let i = 0; i < obj.length; i++)
         {
             this.HEROES.push(GameObject.convertObj(obj[i]));
         }
-        console.log("initializeHeroes");
     }
     initializeObjects(obj)
     {
@@ -415,6 +413,7 @@ export class GameObject
         let cell = game.getCellByObj(this);
         if(cell !== null){//check if the obj is in the grid
             cell.obj = game.getEmptyObj();
+            console.log("kill the obj");
             if (this === game.player)
             {
                 // Kill the player.
@@ -473,16 +472,12 @@ export class GameObject
     executeEffects(event,v){
 
         let game = GameInstance.getInstance();
-        console.log(game.EFFECTS);
-        console.log("game.EFFECTS");
         for (let i = 0; i < this.effects.length; i++){
             let eTmp = game.EFFECTS[this.effects[i]];
-            console.log(game.EFFECTS);
             if(eTmp.isPassive() && eTmp.id_event === event){//death
                 eTmp.execute(v);
             }
         }
-        console.log("w");
     }
     applyCorrosion(){
         this.is_corroded = true;
@@ -536,8 +531,6 @@ export class GameObject
                 do{
                     dir = GameObject.DIR_V[Math.floor(Math.random()*100) % GameObject.DIR_V.length];
                 }while (dir === move);
-                console.log("move dir:"+GameObject.DIR_STR[move]);
-                console.log("winner dir:"+GameObject.DIR_STR[dir]+" : "+dir+" | "+x+" "+y);
 
                 //move the objs and create new obj
                 switch (dir){
@@ -587,16 +580,16 @@ export class GameObject
                 game.player.executeEffects(20,this);//before dmg done
                 game.player.executeEffects(21,this);//before normal dmg done
                 if(weapon != null){
-                    this.takeNormalDamage(weapon.health);
+                    this.takeNormalDamage(game.player,weapon.health);
                     weapon.decreaseUses();
                     if (weapon.uses <= 0){
                         game.playerWeapon.obj = null;
                     }
                 }else if(game.player.health > this.health){
-                    game.player.takeNormalDamage(this.health);
+                    game.player.takeNormalDamage(game.player,this.health);
                     this.health = 0;
                 }else {
-                    this.takeNormalDamage(game.player.health);
+                    this.takeNormalDamage(game.player,game.player.health);
                     game.player.health = 0;
                 }
                 game.player.executeEffects(4,this);//dmg done
@@ -606,6 +599,7 @@ export class GameObject
                     game.player.executeEffects(7,this);//normal dmg done
                 }
 
+                //console.log(this.health);
 
             }
             if(GameObject.IS_INTERACTABLE.includes(this.id_type))//interactable
