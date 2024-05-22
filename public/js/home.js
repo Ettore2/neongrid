@@ -1,7 +1,6 @@
-import {Effect, Hero, GameInstance} from "./gameClasses.js";
+import {GameInstance} from "./gameClasses.js";
 const game = GameInstance.getInstance()
 const HEROES = game.HEROES;
-const EFFECTS = game.EFFECTS;
 const card1 = document.getElementById('hero-card-1');
 const card2 = document.getElementById('hero-card-2');
 const card3 = document.getElementById('hero-card-3');
@@ -19,7 +18,7 @@ let heroIndex = parseInt(sessionStorage.getItem('curr_hero_id'));
 }
 //console.log(heroIndex);
 
-document.getElementById("coins-text").innerText = game.COINS;
+document.getElementById("coins-text").innerText = game.coins;
 
 console.log(HEROES);
 //console.log(EFFECTS);
@@ -66,7 +65,7 @@ function updateCards(){
             btn.removeEventListener('click', play);
             btn.addEventListener('click', buy);
             img.style.display = "block";
-            if(game.COINS < HEROES[heroIndex].price)
+            if(game.coins < HEROES[heroIndex].price)
             {
                 btn.classList.toggle('animation-hover', false);
                 btn.style.background = '#FF0000';
@@ -128,7 +127,7 @@ function buy() {
 
      **/
 
-    if (game.COINS < HEROES[heroIndex].price)
+    if (game.coins < HEROES[heroIndex].price)
         return;
 
     btn.value = HEROES[heroIndex].id;

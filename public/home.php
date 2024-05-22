@@ -36,13 +36,13 @@ check_login();
 </head>
 <body style="background-image: url('assets/images/backgrounds/bghome.jpg'); background-repeat: no-repeat; background-size: cover;">
 <script type="module">
-    import {Effect, Hero, GameInstance} from "./js/gameClasses.js";
+    import {GameInstance} from "./js/gameClasses.js";
 
 
     const game = GameInstance.getInstance();
 
     //get coins
-    game.COINS = <?=getCoins(CONN, $_SESSION[SESSION_EMAIL])?>;
+    game.coins = <?=getCoins(CONN, $_SESSION[SESSION_EMAIL])?>;
     game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>);
     game.initializeEffects(<?php echo (json_encode(getEffects(CONN))); ?>)
 

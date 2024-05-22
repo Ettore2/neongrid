@@ -49,7 +49,8 @@
 {
     width: 100%;
 }
-.game-card{
+.game-card
+{
     border-width: 3px !important;
     cursor: pointer;
 }
@@ -57,7 +58,7 @@
 {
     border-width: 3px !important;
     margin: 30% auto 0 auto;
-    width: 40%;
+    width: 45%;
     scale: 160%;
 }
 #hover-card
@@ -73,7 +74,7 @@
 #active-btn
 {
     border-width: 3px !important;
-    margin: 50% auto 0 auto;
+    margin: 55% auto 0 auto;
     width: 40%;
     scale: 160%;
 }
@@ -84,6 +85,17 @@
 #weapon-info
 {
     color:white;
+}
+#quit-btn
+{
+    margin-left: 1%;
+    margin-bottom: 1%;
+    z-index: 99999999999;
+    position: fixed;
+    bottom: 0;
+    border-width: 3px;
+    border-color: #710000;
+    font-weight:bold;
 }
 .card-name
 {

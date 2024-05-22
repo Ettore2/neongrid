@@ -8,71 +8,54 @@ const hoverGameCell = new GameCell(document.getElementById('hover-card'),null);
 //console.log(game.OBJECTS)
 //console.log(game.EFFECTS)
 //console.log(game.TYPES)
-let gameObjects = Array();
-for(let i = 0; i < game.OBJECTS.length; i++)
-{
-    if(gameObjects[game.OBJECTS[i].id_type] === undefined){
-        gameObjects[game.OBJECTS[i].id_type] = Array();
-    }
-    gameObjects[game.OBJECTS[i].id_type].push(game.OBJECTS[i]);
-}
 //console.log(gameObjects)
-let hero = null;
-{
-    let heroId = parseInt(sessionStorage.getItem("curr_hero_id"));
-    for (let i = 0; i < game.HEROES.length && hero === null; i++){
-        if(heroId === game.HEROES[i].id)
-        {
-            hero = game.HEROES[i];
-        }
-    }
-    //console.log(hero);
-}//get playing hero
-
-let playedTurns = 0;
-let collectedCoins = 0;
-let rows = 3, columns = 3;
-let heroX = parseInt(columns/2), heroY = parseInt(rows/2);
-let gameGrid = [];
-
-const gameCards = document.querySelectorAll('.game-card');
-
+game.setPlayer(parseInt(sessionStorage.getItem("curr_hero_id")))
+game.coins = 0;
+game.gameCards = document.querySelectorAll('.game-card');
+game.playerWeapon = new GameCell(document.querySelector('#weapon-card'),null);
 
 document.querySelector('#hover-card').style.opacity = 0;
 //initialize game cards
-for (let i = 0; i < gameCards.length; i++)
+for (let i = 0; i < game.gameCards.length; i++)
 {
-    if(parseInt(i/columns) === 0){
-        gameGrid.push([]);
+    if(parseInt(i/game.columns) === 0){
+        game.gameGrid.push([]);
     }
-    gameCards[i].addEventListener('click', (e) =>
+    game.gameCards[i].addEventListener('click', (e) =>
     {
-        //console.log('Clicked');
+        //console.log('Clicked');a//get who is clicked and if it is legal
+
+        //get actors
+        let obj = game.getCellByCard(getFather(e.target)).obj;
+        if(obj.click()){
+            game.playedTurns++;
+            if(game.player.health === 0){
+                game.player.die(obj)
+            }
+
+            for(let x = 0; x < game.gameGrid.length; x++){
+                for(let y = 0; y < game.gameGrid[x].length; y++){
+                    if(game.gameGrid[x][y].obj.is_corroded){
+                        game.gameGrid[x][y].obj.takeSpecialDamage(1);
+                    }
+                }
+            }
+            graphicUpdate()
+        }
+
     });
-    gameCards[i].addEventListener('mouseover', (e) =>
+    game.gameCards[i].addEventListener('mouseover', (e) =>
     {
 
-        //get the calling card
-        //console.log(card);
-        let classes = e.target.classList;
-        //console.log(classes);
-        let father = e.target;
-        if (classes.contains('card-name') || classes.contains('card-img-top') || classes.contains("card-body"))
-        {
-            father = e.target.parentElement;
-        }
-        else if (!classes.contains("game-card"))
-        {
-            father = e.target.parentElement.parentElement;
-        }
-        let elements = father.children;
+        let card = getFather(e.target);
+        let elements = card.children;
 
         //find the obj of the calling card
         let objTmp = null;
-        for(let i = 0; i < gameGrid.length && objTmp === null; i++ ){
-            for(let j = 0; j < gameGrid[i].length && objTmp === null; j++ ){
-                if(gameGrid[i][j].card === father){
-                    objTmp = gameGrid[i][j].obj;
+        for(let i = 0; i < game.gameGrid.length && objTmp === null; i++ ){
+            for(let j = 0; j < game.gameGrid[i].length && objTmp === null; j++ ){
+                if(game.gameGrid[i][j].card === card){
+                    objTmp = game.gameGrid[i][j].obj;
                 }
             }
         }
@@ -82,21 +65,22 @@ for (let i = 0; i < gameCards.length; i++)
         hoverGameCell.graphicUpdatePlus();
 
         //change the visibility
-        let card = document.querySelector('#hover-card');
-        card.style.transitionDuration = "0.8s";
-        card.style.opacity = 1;
+        let cardHover = document.querySelector('#hover-card');
+        cardHover.style.transitionDuration = "0.8s";
+        cardHover.style.opacity = 1;
     });
-    gameCards[i].addEventListener('mouseleave', (e) =>
+    game.gameCards[i].addEventListener('mouseleave', (e) =>
     {
         document.querySelector('#hover-card').style.transitionDuration = "0.5s";
         document.querySelector('#hover-card').style.opacity = 0;
     });
-    if(i === parseInt((rows*columns-1)/2)){
-        gameGrid[parseInt(i/columns)].push(new GameCell(gameCards[i],hero));
+    if(i === parseInt((game.rows*game.columns-1)/2)){
+        game.gameGrid[parseInt(i%game.columns)].push(new GameCell(game.gameCards[i],game.player));
+        //console.log(game.player);
     }else {
-        let tmp = new GameCell(gameCards[i],createNewObject());
+        let tmp = new GameCell(game.gameCards[i],createNewObject());
         //console.log(tmp.obj);
-        gameGrid[parseInt(i/columns)].push(tmp);
+        game.gameGrid[parseInt(i%game.columns)].push(tmp);
     }
 
 
@@ -123,53 +107,43 @@ document.querySelector('#quit-btn').addEventListener('click', () =>
 
 function graphicUpdate()
 {
-    turnsText.innerText = playedTurns;
-    coinsText.innerText = collectedCoins;
+    turnsText.innerText = game.playedTurns;
+    coinsText.innerText = game.coins;
 
-    for(let i = 0; i < gameGrid.length; i++){
-        for(let j = 0; j < gameGrid[i].length; j++){
-            gameGrid[i][j].graphicUpdate();
+    for(let i = 0; i < game.gameGrid.length; i++){
+        for(let j = 0; j < game.gameGrid[i].length; j++){
+            //console.log(game.gameGrid[i][j]);
+            game.gameGrid[i][j].graphicUpdate();
         }
+    }
+
+    if(game.playerWeapon.obj === null){
+        game.playerWeapon.card.style.opacity = '0';
+    }else{
+        game.playerWeapon.graphicUpdate();
+        game.playerWeapon.card.style.opacity = '1';
     }
 
 
 }
 function createNewObject()
 {
-    //get the type
-    let random = Math.floor(Math.random()*100+1);
-    let sum = 0, type = null;
-    //console.log("random: "+random);
-    for (let i = 0; i < game.TYPES.length && type === null; i++){
-        sum += game.TYPES[i].spawn_rate;
-        //console.log("sum: "+sum);
-
-        if(sum >= random){
-            type = game.TYPES[i];
-        }
+    return game.createNewObject();
+}
+/**
+ * @param {HTMLElement} htmlElem
+ * **/
+function getFather(htmlElem){
+    let classes = htmlElem.classList;
+    //console.log(classes);
+    let father = htmlElem;
+    if (classes.contains('card-name') || classes.contains('card-img-top') || classes.contains("card-body"))
+    {
+        father = htmlElem.parentElement;
     }
-
-    //console.log('Type: '+type.id);
-    //get probability
-    let probability = 0;
-    let objsOfChoice = gameObjects[type.id];
-    //console.log(objsOfChoice);
-    for(let i = 0; i < objsOfChoice.length; i++){
-        probability += objsOfChoice[i].spawn_indicator;
+    else if (!classes.contains("game-card"))
+    {
+        father = htmlElem.parentElement.parentElement;
     }
-
-    //get the object
-    random = Math.floor(Math.random()*probability+1);
-    sum = 0;
-    let winner = null;
-    for (let i = 0; i < objsOfChoice.length && winner === null; i++){
-        sum += objsOfChoice[i].spawn_indicator;
-
-        if(sum >= random){
-            winner = objsOfChoice[i];
-        }
-    }
-
-    //console.log("return: "+winner);
-    return winner;
+    return father;
 }

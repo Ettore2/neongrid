@@ -64,7 +64,7 @@ function getObjects(mysqli $connect):array
     //need the cast type (by default they are strings)
     $effects_field = "effects";
     $objects = array();
-    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,object.uses
+    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,object.uses,object.max_health
             FROM object where id_type != 1";
     $stmt = $connect->prepare($sql);
     $stmt->execute();
@@ -76,6 +76,7 @@ function getObjects(mysqli $connect):array
         $row["health"] = (int)$row["health"];
         $row["spawn_indicator"] = (int)$row["spawn_indicator"];
         $row["uses"] = (int)$row["uses"];
+        $row["max_health"] = (int)$row["max_health"];
         $row[$effects_field] = array();
         $objects[] = $row;
     }
@@ -111,7 +112,7 @@ function getHeroes(mysqli $connect, $email):array
     //need the cast type (by default they are strings)
     $effects_field = "effects";
     $heroes = array();
-    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,value as price, have_hero.id as owned
+    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,value as price, have_hero.id as owned, object.max_health
             FROM object 
             join type on object.id_type = type.id
             join price on price.id = object.id_price
@@ -133,6 +134,7 @@ function getHeroes(mysqli $connect, $email):array
         $row["spawn_indicator"] = (int)$row["spawn_indicator"];
         $row["price"] = (int)$row["price"];
         $row["owned"] = $row["owned"] !== null;
+        $row["max_health"] = (int)$row["max_health"];
         $heroes[] = $row;
 
     }
@@ -175,6 +177,7 @@ function getEffects(mysqli $connect): array
         $row["id"] = (int)$row["id"];
         $row["value"] = (int)$row["value"];
         $row["cd"] = (int)$row["cd"];
+        $row["is_shown"] = $row["is_shown"] ===1;
         $return[] = $row;
     }
 
@@ -228,7 +231,7 @@ function getHeroById(mysqli $connect, string $email, int $id_hero): array
 {
     //need the cast type (by default they are strings)
     $effects_field = "effects";
-    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,value as price, have_hero.id as owned
+    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,value as price, have_hero.id as owned, object.max_health
             FROM object 
             join type on object.id_type = type.id
             join price on price.id = object.id_price
@@ -247,6 +250,7 @@ function getHeroById(mysqli $connect, string $email, int $id_hero): array
     $row["spawn_indicator"] = (int)$row["spawn_indicator"];
     $row["price"] = (int)$row["price"];
     $row["owned"] = $row["owned"] !== null;
+    $row["max_health"] = (int)$row["max_health"];
 
     $hero = $row;
 

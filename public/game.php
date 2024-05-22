@@ -40,12 +40,12 @@ check_login();
 </head>
 <body style="background-image: url('assets/images/backgrounds/bggame.jpg'); background-repeat: no-repeat; background-size: cover;">
     <script type="module">
-        import {Type,Effect, Hero, GameInstance, GameObject} from "./js/gameClasses.js";
+        import {Type,Effect, GameInstance, GameObject} from "./js/gameClasses.js";
         sessionStorage.setItem('curr_hero_id', <?=$_POST["hero_id"]?>);
 
         const game = GameInstance.getInstance();
 
-        game.COINS = 0;
+        game.coins = 0;
         game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>);
         game.initializeObjects(<?php echo (json_encode(getObjects(CONN))); ?>);
         game.initializeTypes(<?php echo (json_encode(getTypes(CONN))); ?>);
@@ -205,7 +205,7 @@ check_login();
 
     </div>
     <div class="col-2">
-        <button id="quit-btn" style="margin-left: 1%; margin-bottom: 1%;z-index: 99999999999;position: fixed;bottom: 0;" class="btn btn-danger">Quit</button>
+        <button id="quit-btn" class="btn btn-danger btn-lg">Quit</button>
     </div>
 </section>
 <script type="module" src="js/game.js"></script>

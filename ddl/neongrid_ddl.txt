@@ -14,6 +14,12 @@ CREATE TABLE version
     description varchar(10) NOT NULL unique,
     PRIMARY KEY (id)
 );
+CREATE TABLE game_event
+(
+    id int(10) NOT NULL AUTO_INCREMENT,
+    description varchar(30) NOT NULL,
+    PRIMARY KEY (id)
+);
 CREATE TABLE Object
 (
     id int(10) NOT NULL AUTO_INCREMENT,
@@ -21,6 +27,7 @@ CREATE TABLE Object
     id_price int default null,
     name varchar(50) NOT NULL,
     health int(10) NOT NULL,
+    max_health int(10),
     uses int(10),
     img varchar(100) NOT NULL,
     spawn_indicator int(10) NOT NULL,
@@ -70,7 +77,9 @@ CREATE TABLE `effect`
     name varchar(30) NOT NULL,
     description varchar(100) NOT NULL,
     value int(10) default 0,
+    is_shown int(1) default 1,
     cd int(10) default 0,
+    id_event int(10),
     PRIMARY KEY (id)
 );
 
@@ -90,17 +99,25 @@ ALTER TABLE Run ADD CONSTRAINT FKRun588439 FOREIGN KEY (id_user) REFERENCES `Use
 ALTER TABLE Run ADD CONSTRAINT FKRun838874 FOREIGN KEY (id_hero) REFERENCES `object` (id);
 ALTER TABLE Run ADD CONSTRAINT FKRun838875 FOREIGN KEY (id_version) REFERENCES `version` (id);
 ALTER TABLE object ADD CONSTRAINT FKObject838874 FOREIGN KEY (id_price) REFERENCES `price` (id);
+ALTER TABLE effect ADD CONSTRAINT FKEffect838874 FOREIGN KEY (id_event) REFERENCES `game_event` (id);
 
 
 
 INSERT into user (username, email, password,coins) VALUES
 ("marco","marco@gmail.com","$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K",9999999);
-
 INSERT into user (username, email, password) VALUES
 ("mario","mario@gmail.com","$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K");
 
 INSERT into price (value) VALUES
 (500),(600),(700);
+
+INSERT into game_event (description) VALUES
+("on death"),("on spawn"),("on dmg taken"),
+("on damage done"),("on normal dmg taken"),
+("on normal damage done"),("on special dmg taken"),
+("on special damage done"),("on kill"),("on heal"),
+("on trap damage"),("on turn end"),("on turn start"),
+("on interaction"),("on effect applied"),("on turn play");
 
 INSERT into type (description, spawn_rate, color_bg, color_bd, have_max_health) VALUES
 ("hero",0,"#fff9b3","#fff200",1),
@@ -110,20 +127,20 @@ INSERT into type (description, spawn_rate, color_bg, color_bd, have_max_health) 
 ("weapon",25,"#8fa8ff","#0031ff",0),
 ("trap",10,"#dca969","#d56900",0);
 
-INSERT into object (name,health,img,id_type,spawn_indicator,id_price) VALUES
-("normie",15,"normie.jpeg",1,1,1),
-("tank",15,"tank.jpeg",1,1,1),
-("speedy",6,"speedy.jpeg",1,1,1),
-("warrior",8,"warrior.jpeg",1,1,2);
-INSERT into object (name,health,img,id_type,spawn_indicator) VALUES
-("robot",5,"robot.jpeg",2,10),
-("drone",2,"drone.jpeg",2,7),
-("vandal",7,"vandal.jpeg",2,8),
-("cyber dog",4,"robotic_dog.jpeg",2,6),
-("toxic bot",8,"toxic_bot.jpeg",2,3),
-("mafioso",7,"cyber_mafioso.jpeg",2,7),
-("spiked bot",7,"spike_bot.jpeg",2,3),
-("stalker bot",12,"stalker_bot.jpeg",2,2);
+INSERT into object (name,health,max_health,img,id_type,spawn_indicator,id_price) VALUES
+("normie",10,10,"normie.jpeg",1,1,1),
+("tank",15,15,"tank.jpeg",1,1,1),
+("speedy",6,6,"speedy.jpeg",1,1,1),
+("warrior",8,8,"warrior.jpeg",1,1,2);
+INSERT into object (name,health,max_health,img,id_type,spawn_indicator) VALUES
+("robot",5,5,"robot.jpeg",2,10),
+("drone",2,2,"drone.jpeg",2,7),
+("vandal",7,7,"vandal.jpeg",2,8),
+("cyber dog",4,4,"robotic_dog.jpeg",2,6),
+("toxic bot",8,8,"toxic_bot.jpeg",2,3),
+("mafioso",7,7,"cyber_mafioso.jpeg",2,7),
+("spiked bot",7,7,"spike_bot.jpeg",2,3),
+("stalker bot",12,12,"stalker_bot.jpeg",2,2);
 INSERT into object (name,health,img,id_type,spawn_indicator) VALUES
 ("coins",5,"coin.jpeg",3,10),
 ("coins",15,"coin.jpeg",3,5),
@@ -139,7 +156,7 @@ INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
 ("katana",6,2,"katana.jpeg",5,7),
 ("taser",2,5,"taser.jpeg",5,4),
 ("gun",5,3,"pistol.jpeg",5,3),
-("corrosive knife",2,1,"toxic_knife.jpeg",5,4),
+("toxic knife",2,1,"toxic_knife.jpeg",5,4),
 ("toxic gun",3,2,"toxic_gun.jpeg",5,1),
 ("laser sword",4,3,"laser_sword.jpeg",5,10),
 ("shotgun",8,2,"knife.jpeg",5,4);
@@ -149,48 +166,54 @@ INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
 ("bomb",3,4,"bomb.jpeg",6,10),
 ("toxic puddle",2,3,"toxic_puddle.jpeg",6,2),
 ("",0,0,"empty.jpeg",6,0);
-INSERT into object (name,health,img,id_type,spawn_indicator,id_price) VALUES
-("absorber",5,"absorber.jpeg",1,1,3);
+INSERT into object (name,health,max_health,img,id_type,spawn_indicator,id_price) VALUES
+("absorber",5,5,"absorber.jpeg",1,1,3),
+("turret",10,10,"turret.jpeg",6,5,null),
+("turret",10,10,"turret.jpeg",6,5,null);
 
 
-INSERT into effect (name, description, value, cd) VALUES
-("corrosion resistance","corrosion stops at 3 hp",3,0),
-("pocket knife","gain a 4*1 knife",4,6),
-("beefed out","potions cure 2 hp extra",2,0),
-("upgrade","increase by 1 the power of all adjacent cells",1,7),
-("agile","immune to traps",0,0),
-("swap","change place with an adjacent cell",0,3),
-("furious","do not consume the weapon on a kill",0,0),
-("critical hit","the next attack deal 2x damage",2,7);
-INSERT into effect (name, description, value) VALUES
-("shield","ignore the first damage taken",1),
-("revenge","destroy the weapon that kill him",0),
-("death puddle","spawn a toxic puddle on death",32),
-("corrosive touch","give corrosion when attacked",1),
-("wealthy","spawn coins when killed",13),
-("spikes","deal 1 damage back when attacked",1),
-("damage absorption","take 1 less damage from all sources except corrosion",1),
-("armed","spawn a weapon when killed",1),
-("laser trap activation","activate next turn",30),
-("laser trap deactivation","deactivate next turn",29),
-("detonation","when it dies it explodes dealing as much damage as its health to adjacent cells",4),
-("corrosive","give corrosion to the target",1),
-("temporary-3","expire after 3 turns",3),
-("temporary-4","expire after 4 turns",4),
-("toxins immunity","immune to corrosion",0),
-("poisonous","give corrosion",1),
-("healing","heal",0),
-("coins","give coins",0);
-INSERT into effect (name, description, value, cd) VALUES
-("shield generator","if you don't have a shield create 1",1,10),
-("drain","regenerate 1 hp when killing an enemy",1,0);
+INSERT into effect (name, description, value, cd, id_event) VALUES
+("corrosion resistance","corrosion stops at 3 hp",3,0,7),
+("pocket knife","gain a 4*1 knife",4,6,null),
+("beefed out","potions cure 2 hp extra",2,0,10),
+("upgrade","increase by 1 the power of all adjacent cells",1,7,null),
+("agile","immune to traps",0,0,11),
+("swap","change place with an adjacent cell",0,3,null),
+("furious","do not consume the weapon on a kill",0,0,9),
+("critical hit","the next attack deal 2x damage",2,7,4);
+INSERT into effect (name, description, value, id_event) VALUES
+("shield","ignore the first damage taken",1,5),
+("revenge","destroy the weapon that kill him",0,1),
+("death puddle","spawn a toxic puddle on death",32,1),
+("corrosive touch","give corrosion when attacked",1,5),
+("wealthy","spawn coins when killed",13,1),
+("spikes","deal 1 damage back when attacked",1,5),
+("damage absorption","take 1 less damage from all sources except corrosion",1,5),
+("armed","spawn a weapon when killed",1,1),
+("laser trap activation","activate next turn",30,12),
+("laser trap deactivation","deactivate next turn",29,12),
+("detonation","when it dies it explodes dealing as much damage as its health to adjacent cells",4,1),
+("corrosive","give corrosion to the target",1,4),
+("temporary-3","expire after 3 turns",3,12),
+("temporary-4","expire after 4 turns",4,12),
+("toxins immunity","immune to corrosion",0,15),
+("poisonous","give corrosion",1,14),
+("healing","heal",0,14),
+("coins","give coins",0,14);
+INSERT into effect (name, description, value, cd, id_event,is_shown) VALUES
+("shield generator","if you don't have a shield create 1",1,10,null,1),
+("drain","regenerate 1 hp when killing an enemy",1,0,9,1),
+("have rotation","spawn with random rotation",0,0,2,0),
+("passive attack","deals 1 damage if facing the player",1,0,16,1),
+("rotate clockwise","rotate clockwise at the end of every turn",1,0,12,1),
+("rotate counter clockwise","rotate counter clockwise at the end of every turn",1,0,12,1);
 
 INSERT into have_effect (id_object, id_effect) VALUES
 (1,1),(1,2),(2,3),(2,4),(3,5),(3,6),(4,7),(4,8);
 INSERT into have_effect (id_object, id_effect) VALUES
 (6,9),(8,10),(9,11),(9,12),(9,23),(10,13),(11,14),(12,15),(19,11),(20,16),(25,20),(26,20),(29,18),(30,19),(31,22),(32,21),(32,24),(13,26),(14,26),(15,25),(16,25),(17,24),(18,24);
 INSERT into have_effect (id_object, id_effect) VALUES
-(34,27),(34,28);
+(34,27),(34,28),(35,29),(35,30),(35,31),(36,29),(36,30),(36,32);
 
 INSERT into have_hero (id_user, id_hero) VALUES
 (1,1),(1,2),(1,4),(2,2),(2,3);
