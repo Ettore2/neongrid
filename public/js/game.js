@@ -6,7 +6,8 @@ const coinsText = document.querySelector('#coins-text');
 const hoverGameCell = new GameCell(document.getElementById('hover-card'),null);
 //console.log(game.HEROES)
 //console.log(game.OBJECTS)
-//console.log(game.EFFECTS)
+console.log(game.EFFECTS)
+console.log("??????????????????????????")
 //console.log(game.TYPES)
 //console.log(gameObjects)
 game.setPlayer(parseInt(sessionStorage.getItem("curr_hero_id")))
@@ -115,7 +116,7 @@ graphicUpdate();
 document.querySelector('#quit-btn').addEventListener('click', () =>
 {
     //suicide the hero
-
+    game.player.killPlayer();
 
 
 

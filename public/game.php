@@ -44,13 +44,17 @@ check_login();
         sessionStorage.setItem('curr_hero_id', <?=$_POST["hero_id"]?>);
 
         const game = GameInstance.getInstance();
+        game.DT_START = Date.now;
 
         game.coins = 0;
+        //console.log("game.EFFECTS");
         game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>);
         game.initializeObjects(<?php echo (json_encode(getObjects(CONN))); ?>);
         game.initializeTypes(<?php echo (json_encode(getTypes(CONN))); ?>);
         game.initializeEffects(<?php echo (json_encode(getEffects(CONN))); ?>);
-        //console.log(game.OBJECTS);
+
+        //console.log(game.EFFECTS);
+        //console.log("-----------------------------------");
     </script>
 
 <section class="vh-100 bg-image">
@@ -205,7 +209,7 @@ check_login();
 
     </div>
     <div class="col-2">
-        <button id="quit-btn" class="btn btn-danger btn-lg">Quit</button>
+        <button id="quit-btn" class="btn btn-danger btn-lg" name="quit-btn">Quit</button>
     </div>
 </section>
 <script type="module" src="js/game.js"></script>

@@ -177,8 +177,8 @@ function getEffects(mysqli $connect): array
         $row["id"] = (int)$row["id"];
         $row["value"] = (int)$row["value"];
         $row["cd"] = (int)$row["cd"];
-        $row["is_shown"] = $row["is_shown"] ===1;
-        $row["is_event"] = (int)$row["is_event"];
+        $row["is_shown"] = $row["is_shown"]===1;
+        $row["id_event"] = (int)$row["id_event"];
         $return[] = $row;
     }
 

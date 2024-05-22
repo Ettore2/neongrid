@@ -18,6 +18,7 @@ export class GameInstance
         this.playerWeapon = null;
         this.EMPTY_OBJ_ID = 33;
         this.EMPTY_OBJ_INSTANCE;
+        this.DT_START = null;
 
     }
     static getInstance() {
@@ -38,11 +39,13 @@ export class GameInstance
     //elaborate data from php
     initializeHeroes(obj)
     {
+        console.log("initializeHeroes");
         //get heroes
         for(let i = 0; i < obj.length; i++)
         {
             this.HEROES.push(GameObject.convertObj(obj[i]));
         }
+        console.log("initializeHeroes");
     }
     initializeObjects(obj)
     {
@@ -173,6 +176,18 @@ export class GameInstance
 
         //console.log("return: "+winner);
         return GameObject.convertObj(winner);
+    }
+
+    /**
+     * Kills the player **/
+    killPlayer()
+    {
+        let diff = this.DT_START - Date.now();
+        window.location.href = './game_end-php?' +
+                                'playedTurns='+this.playedTurns
+                                +'&coins='+this.coins
+                                +'&id_player='+this.player.id
+                                +'&played_time='+diff;
     }
 
 }
@@ -398,8 +413,13 @@ export class GameObject
         this.executeEffects(1,null);
 
         let cell = game.getCellByObj(this);
-        if(cell !== null){
+        if(cell !== null){//check if the obj is in the grid
             cell.obj = game.getEmptyObj();
+            if (this === game.player)
+            {
+                // Kill the player.
+
+            }
         }
     }
     /**
@@ -451,12 +471,18 @@ export class GameObject
      * @param {int} event
      * @param v**/
     executeEffects(event,v){
+
+        let game = GameInstance.getInstance();
+        console.log(game.EFFECTS);
+        console.log("game.EFFECTS");
         for (let i = 0; i < this.effects.length; i++){
-            let eTmp = game.EFFECTS[this.effects[i]]
+            let eTmp = game.EFFECTS[this.effects[i]];
+            console.log(game.EFFECTS);
             if(eTmp.isPassive() && eTmp.id_event === event){//death
                 eTmp.execute(v);
             }
         }
+        console.log("w");
     }
     applyCorrosion(){
         this.is_corroded = true;
@@ -622,10 +648,11 @@ export class Effect
 
         this.execute = (v) => {}
 
+        /*
         switch (id){
             case 1:
                 break
-        }
+        }*/
 
 
     }

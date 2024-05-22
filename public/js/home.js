@@ -1,4 +1,4 @@
-import {GameInstance} from "./gameClasses.js";
+import {GameInstance,GameObject} from "./gameClasses.js";
 const game = GameInstance.getInstance()
 const HEROES = game.HEROES;
 const card1 = document.getElementById('hero-card-1');
@@ -88,7 +88,7 @@ function updateCards(){
 }
 /**
  * @param {HTMLElement} card
- * @param {Hero} hero
+ * @param {GameObject} hero
  **/
 function setCardAttribute(card, hero){
     let elements = card.children;
