@@ -37,9 +37,28 @@ for (let i = 0; i < game.gameCards.length; i++)
                 for(let y = 0; y < game.gameGrid[x].length; y++){
                     if(game.gameGrid[x][y].obj.is_corroded){
                         game.gameGrid[x][y].obj.takeSpecialDamage(1);
+                        game.gameGrid[x][y].obj.executeEffects(7,this);//special damage taken
                     }
                 }
             }
+
+            for(let x = 0; x < game.gameGrid.length; x++){
+                for(let y = 0; y < game.gameGrid[x].length; y++){
+                    this.executeEffects(12,this);//normal turn end
+                }
+            }
+            for(let x = 0; x < game.gameGrid.length; x++){
+                for(let y = 0; y < game.gameGrid[x].length; y++){
+                    this.executeEffects(13,this);//normal turn start
+                }
+            }
+            for(let x = 0; x < game.gameGrid.length; x++){
+                for(let y = 0; y < game.gameGrid[x].length; y++){
+                    this.executeEffects(16,this);//normal turn play
+                }
+            }
+
+
             graphicUpdate()
         }
 
@@ -72,7 +91,7 @@ for (let i = 0; i < game.gameCards.length; i++)
     game.gameCards[i].addEventListener('mouseleave', (e) =>
     {
         document.querySelector('#hover-card').style.transitionDuration = "0.5s";
-        document.querySelector('#hover-card').style.opacity = 0;
+        document.querySelector('#hover-card').style.opacity = '0';
     });
     if(i === parseInt((game.rows*game.columns-1)/2)){
         game.gameGrid[parseInt(i%game.columns)].push(new GameCell(game.gameCards[i],game.player));

@@ -162,10 +162,12 @@ export class GameInstance
         sum = 0;
         let winner = null;
         for (let i = 0; i < objsOfChoice.length && winner === null; i++){
-            sum += objsOfChoice[i].spawn_indicator;
+            if(objsOfChoice[i].spawn_indicator !== 0){
+                sum += objsOfChoice[i].spawn_indicator;
 
-            if(sum >= random){
-                winner = objsOfChoice[i];
+                if(sum >= random){
+                    winner = objsOfChoice[i];
+                }
             }
         }
 
@@ -174,7 +176,6 @@ export class GameInstance
     }
 
 }
-
 export class GameObject
 {
 
@@ -237,6 +238,9 @@ export class GameObject
         }else{
             this._max_health = -1;
         }
+
+
+        this.executeEffects(2,this);
     }
     static convertObj(obj)
     {
@@ -322,7 +326,7 @@ export class GameObject
         let EFFECTS = GameInstance.getInstance().EFFECTS;
 
         for(let i = 0; i < this.effects.length; i++){
-            if(EFFECTS[this.effects[i]].cd !== 0){
+            if(!EFFECTS[this.effects[i]].isPassive()){
                 return EFFECTS[this.effects[i]];
             }
         }
@@ -334,7 +338,7 @@ export class GameObject
         let EFFECTS = GameInstance.getInstance().EFFECTS;
 
         for(let i = 0; i < this.effects.length; i++){
-            if(EFFECTS[this.effects[i]].cd === 0){
+            if(EFFECTS[this.effects[i]].isPassive()){
                 return EFFECTS[this.effects[i]];
             }
         }
@@ -360,6 +364,7 @@ export class GameObject
         if(this.health > this._max_health && this.getType().have_max_health){
             this.health = this._max_health
         }
+        this.executeEffects(10, this);//heal
     }
     haveUses(){
         return this.uses !== undefined && this.uses !== 0;
@@ -368,7 +373,7 @@ export class GameObject
         let game = GameInstance.getInstance();
         let result = Array();
         for(let i = 0; i < this.effects.length; i++){
-            if(game.EFFECTS[this.effects[i]].cd === 0){
+            if(game.EFFECTS[this.effects[i]].isPassive()){
                 result.push(game.EFFECTS[this.effects[i]]);
             }
         }
@@ -377,7 +382,7 @@ export class GameObject
     havePassives(){
         let game = GameInstance.getInstance();
         for(let i = 0; i < this.effects.length; i++){
-            if(game.EFFECTS[this.effects[i]].cd === 0){
+            if(game.EFFECTS[this.effects[i]].isPassive()){
                 return true;
             }
         }
@@ -390,6 +395,8 @@ export class GameObject
      * @param {GameObject} obj **/
     die(obj){
         let game = GameInstance.getInstance();
+        this.executeEffects(1,null);
+
         let cell = game.getCellByObj(this);
         if(cell !== null){
             cell.obj = game.getEmptyObj();
@@ -412,8 +419,11 @@ export class GameObject
         }
     }
     /**
+     * @param {GameObject} source
      * @param {int} dmg **/
-    takeNormalDamage(dmg){
+    takeNormalDamage(source, dmg){
+        this.executeEffects(17,this);//before dmg
+        this.executeEffects(18,this);//before normal dmg
         if(!this.haveShields()){
             this.health -= dmg;
             if(this.health < 0){
@@ -422,14 +432,38 @@ export class GameObject
         }else{
             this.shields--;
         }
+        this.executeEffects(3,this);//dmg taken
+        this.executeEffects(5,this);//normal dmg taken
     }
     /**
+     * @param {GameObject} source
      * @param {int} dmg **/
-    takeSpecialDamage(dmg){
+    takeSpecialDamage(source, dmg){
+        this.executeEffects(17,this);//before dmg
+        this.executeEffects(19,this);//before special dmg
         this.health -= dmg;
         if(this.health < 0){
             this.health = 0;
         }
+        this.executeEffects(3,this);//dmg taken
+    }
+    /**
+     * @param {int} event
+     * @param v**/
+    executeEffects(event,v){
+        for (let i = 0; i < this.effects.length; i++){
+            let eTmp = game.EFFECTS[this.effects[i]]
+            if(eTmp.isPassive() && eTmp.id_event === event){//death
+                eTmp.execute(v);
+            }
+        }
+    }
+    applyCorrosion(){
+        this.is_corroded = true;
+        this.executeEffects(15,this);//effect applied
+    }
+    removeCorrosion(){
+        this.is_corroded = false;
     }
     click()
     {
@@ -512,7 +546,7 @@ export class GameObject
                 if(GameObject.DIE_ON_HOVER.includes(this.id_type)){
                     this.die(game.player);
                 }else {
-                    //on interact effects
+                    this.executeEffects(14,this);//normal interaction
                 }
 
             }
@@ -524,6 +558,8 @@ export class GameObject
             if(GameObject.IS_TARGET.includes(this.id_type))//target
             {
                 let weapon = game.playerWeapon.obj
+                game.player.executeEffects(20,this);//before dmg done
+                game.player.executeEffects(21,this);//before normal dmg done
                 if(weapon != null){
                     this.takeNormalDamage(weapon.health);
                     weapon.decreaseUses();
@@ -536,6 +572,12 @@ export class GameObject
                 }else {
                     this.takeNormalDamage(game.player.health);
                     game.player.health = 0;
+                }
+                game.player.executeEffects(4,this);//dmg done
+                game.player.executeEffects(6,this);//normal dmg done
+
+                if(this.health <= 0){
+                    game.player.executeEffects(7,this);//normal dmg done
                 }
 
 
@@ -565,8 +607,9 @@ export class Effect
      * @param {number} value
      * @param {number} cd
      * @param {boolean} is_shown
+     * @param {int} id_event
      * **/
-    constructor(id, name, description, value, cd, is_shown)
+    constructor(id, name, description, value, cd, is_shown, id_event)
     {
         this._id = id;
         this._name = name;
@@ -575,14 +618,24 @@ export class Effect
         this._cd = cd;
         this._currCd = cd;
         this._is_shown = is_shown;
+        this._id_event = id_event;
+
+        this.execute = (v) => {}
+
+        switch (id){
+            case 1:
+                break
+        }
+
+
     }
     static convertObj(obj)
     {
-        return new Effect(obj.id, obj.name, obj.description, obj.value, obj.cd);
+        return new Effect(obj.id, obj.name, obj.description, obj.value, obj.cd,obj.is_shown,obj.id_event);
     }
     static convertJSON(obj)
     {
-        return new Effect(obj._id, obj._name, obj._description, obj._value, obj._cd);
+        return new Effect(obj._id, obj._name, obj._description, obj._value, obj._cd, obj._is_shown, obj._id_event);
     }
 
     get id() {
@@ -611,6 +664,16 @@ export class Effect
 
     get currCd() {
         return this._currCd;
+    }
+
+    get id_event()
+    {
+        return this._id_event;
+    }
+
+    //method
+    isPassive(){
+        return this.cd === 0;
     }
 }
 export class Type

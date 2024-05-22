@@ -116,8 +116,10 @@ INSERT into game_event (description) VALUES
 ("on damage done"),("on normal dmg taken"),
 ("on normal damage done"),("on special dmg taken"),
 ("on special damage done"),("on kill"),("on heal"),
-("on trap damage"),("on turn end"),("on turn start"),
-("on interaction"),("on effect applied"),("on turn play");
+("*unused*"),("on turn end"),("on turn start"),
+("on interaction"),("on effect applied"),("on turn play"),
+("before dmg taken"),("before normal dmg taken"),("before special dmg taken"),
+("before dmg done"),("before normal dmg done"),("before special dmg done");
 
 INSERT into type (description, spawn_rate, color_bg, color_bd, have_max_health) VALUES
 ("hero",0,"#fff9b3","#fff200",1),
@@ -177,7 +179,7 @@ INSERT into effect (name, description, value, cd, id_event) VALUES
 ("pocket knife","gain a 4*1 knife",4,6,null),
 ("beefed out","potions cure 2 hp extra",2,0,10),
 ("upgrade","increase by 1 the power of all adjacent cells",1,7,null),
-("agile","immune to traps",0,0,11),
+("agile","immune to traps",0,0,2),
 ("swap","change place with an adjacent cell",0,3,null),
 ("furious","do not consume the weapon on a kill",0,0,9),
 ("critical hit","the next attack deal 2x damage",2,7,4);
