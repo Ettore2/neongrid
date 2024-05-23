@@ -134,6 +134,8 @@ export class GameInstance
     getEmptyObj(){
         return GameObject.convertObj(this.EMPTY_OBJ_INSTANCE);
     }
+    /**
+     * @return {GameObject} **/
     createNewObject()
     {
         //get the type
@@ -149,6 +151,24 @@ export class GameInstance
             }
         }
 
+        return this.createNewObjectOfType(type);
+    }
+    /**
+     * @param {int} id
+     * @return {GameObject} **/
+    getNewObject(id)
+    {
+        for (let i = 0; i < this.OBJECTS.length; i++){
+            if(this.OBJECTS[i].id() === id){
+                return GameObject.convertObj(this.OBJECTS[i]);
+            }
+        }
+
+
+        return null;
+    }
+    createNewObjectOfType(id_type)
+    {
         //console.log('Type: '+type.id);
         //get probability
         let probability = 0;
@@ -159,8 +179,8 @@ export class GameInstance
         }
 
         //get the object
-        random = Math.floor(Math.random()*probability+1);
-        sum = 0;
+        let random = Math.floor(Math.random()*probability+1);
+        let sum = 0;
         let winner = null;
         for (let i = 0; i < objsOfChoice.length && winner === null; i++){
             if(objsOfChoice[i].spawn_indicator !== 0){
@@ -174,6 +194,7 @@ export class GameInstance
 
         //console.log("return: "+winner);
         return GameObject.convertObj(winner);
+
     }
 
     /**
@@ -376,6 +397,13 @@ export class GameObject
         this.health += val;
         if(this.health > this._max_health && this.getType().have_max_health){
             this.health = this._max_health
+        }
+        this.executeEffects(10, this);//heal
+    }
+    heal_overflow(val){
+        this.health += val;
+        if(this.health > this._max_health && this.getType().have_max_health){
+            this._max_health = this.health
         }
         this.executeEffects(10, this);//heal
     }
@@ -640,13 +668,149 @@ export class Effect
         this._is_shown = is_shown;
         this._id_event = id_event;
 
-        this.execute = (v) => {}
+        this.execute;
 
-        /*
+        //["val"]["owner"]["target"]
+        let game = GameInstance.getInstance();
         switch (id){
             case 1:
+                this.execute = (v) => {
+                    v["val"] = 0;
+                }
                 break
-        }*/
+            case 2:
+                this.execute = (v) => {
+                    v["val"] = game.getNewObject(this.value);
+                }
+                break
+            case 3:
+                this.execute = (v) => {
+                    v["val"] += this.value;
+                }
+                break
+            case 4:
+                this.execute = (v) => {
+                    for(let x = 0; x < game.gameGrid.length; x++){
+                        for(let y = 0; y < game.gameGrid[x].length; y++){
+                            if(game.gameGrid[x][y].obj !== v["owner"]){
+                                game.gameGrid[x][y].obj.heal_overflow(1);
+                            }
+
+                        }
+                    }
+                }
+                break
+            case 5:
+                this.execute = (v) => {
+                    if(v["target"].id_type === 6){
+                        v["val"] = 0;
+                    }
+
+                }
+                break
+            case 6:
+                this.execute = (v) => {
+                    let cell1 = game.getCellByObj(v["target"]);
+                    let cell2 = game.getCellByObj(v["owner"]);
+                    cell1.obj = v["owner"];
+                    cell2.obj = v["target"];
+                }
+                break
+            case 7:
+                this.execute = (v) => {
+                    if(game.playerWeapon.obj !== null){
+                        game.playerWeapon.obj._uses += this.value;
+                    }
+                }
+                break
+            case 8:
+                this.execute = (v) => {
+                    v["val"] *= this.value;
+                }
+                break
+            case 9:
+                this.execute = (v) => {
+                    v["owner"].shields += this.value;
+                }
+                break
+            case 10:
+                this.execute = (v) => {
+                    game.playerWeapon._uses = 0;
+                }
+                break
+            case 11:
+                this.execute = (v) => {
+                    let cell = game.getCellByObj(v["owner"]);
+                    cell.obj = game.getNewObject(this.value);
+                }
+                break
+            case 12:
+                this.execute = (v) => {
+                    v["target"]._is_corroded = ture;
+                }
+                break
+            case 13:
+                this.execute = (v) => {
+                    let cell = game.getCellByObj(v["owner"]);
+                    cell.obj = game.getNewObject(this.value);
+                }
+                break
+            case 14:
+                this.execute = (v) => {
+                    v["target"].takeNormalDamage(v["owner"],this.value);
+                }
+                break
+            case 15:
+                this.execute = (v) => {
+                    v["val"] -= this.value;
+                }
+                break
+            case 16:
+                this.execute = (v) => {
+                    let cell = game.getCellByObj(v["owner"]);
+                    cell.obj = game.createNewObjectOfType(this.value);
+                }
+                break
+            case 17:
+                this.execute = (v) => {
+                    let cell = game.getCellByObj(v["owner"]);
+                    cell.obj = game.createNewObjectOfType(this.value);
+                }
+                break
+            case 18:
+                this.execute = (v) => {
+                    let cell = game.getCellByObj(v["owner"]);
+                    cell.obj = game.createNewObjectOfType(this.value);
+                }
+                break
+            case 19:
+                this.execute = (v) => {
+                    let coord = game.getCoordinates(game.getCellByObj(v["owner"]));
+                    let x = coord[0];
+                    let y = coord[1];
+                    if(x+1 < game.gameGrid.length){
+                        game.gameGrid[x+1][y].obj.takeNormalDamage(v["owner"],this.value);
+                    }
+                    if(x-1 > -1) {
+                        game.gameGrid[x-1][y].obj.takeNormalDamage(v["owner"], this.value);
+                    }
+                    if(y+1 < game.gameGrid[x].length){
+                        game.gameGrid[x][y+1].obj.takeNormalDamage(v["owner"],this.value);
+                    }
+                    if(y-1 > -1) {
+                        game.gameGrid[x][y-1].obj.takeNormalDamage(v["owner"], this.value);
+                    }
+                }
+                break
+            case 20:
+                this.execute = (v) => {
+                    v["owner"]._is_corroded = true;
+                }
+                break
+            default:
+                this.execute = (v) => {}
+                break
+        }
 
 
     }

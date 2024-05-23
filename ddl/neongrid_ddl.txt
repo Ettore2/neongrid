@@ -176,12 +176,12 @@ INSERT into object (name,health,max_health,img,id_type,spawn_indicator,id_price)
 
 INSERT into effect (name, description, value, cd, id_event) VALUES
 ("corrosion resistance","corrosion stops at 3 hp",3,0,7),
-("pocket knife","gain a 4*1 knife",4,6,null),
+("pocket knife","gain a 4*1 knife",21,6,null),
 ("beefed out","potions cure 2 hp extra",2,0,10),
 ("upgrade","increase by 1 the power of all adjacent cells",1,7,null),
 ("agile","immune to traps",0,0,2),
 ("swap","change place with an adjacent cell",0,3,null),
-("furious","do not consume the weapon on a kill",0,0,9),
+("furious","do not consume the weapon on a kill",1,0,9),
 ("critical hit","the next attack deal 2x damage",2,7,4);
 INSERT into effect (name, description, value, id_event) VALUES
 ("shield","ignore the first damage taken",1,5),
@@ -191,7 +191,7 @@ INSERT into effect (name, description, value, id_event) VALUES
 ("wealthy","spawn coins when killed",13,1),
 ("spikes","deal 1 damage back when attacked",1,5),
 ("damage absorption","take 1 less damage from all sources except corrosion",1,5),
-("armed","spawn a weapon when killed",1,1),
+("armed","spawn a weapon when killed",3,1),
 ("laser trap activation","activate next turn",30,12),
 ("laser trap deactivation","deactivate next turn",29,12),
 ("detonation","when it dies it explodes dealing as much damage as its health to adjacent cells",4,1),
