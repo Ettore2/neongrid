@@ -167,9 +167,9 @@ export class GameInstance
 
         return null;
     }
-    createNewObjectOfType(id_type)
+    createNewObjectOfType(type)
     {
-        //console.log('Type: '+type.id);
+        console.log('Type: '+type);
         //get probability
         let probability = 0;
         let objsOfChoice = this.gameObjects[type.id];
@@ -201,12 +201,17 @@ export class GameInstance
      * Kills the player **/
     killPlayer()
     {
-        let diff = this.DT_START - Date.now();
-        window.location.href = './game_end-php?' +
-                                'playedTurns='+this.playedTurns
-                                +'&coins='+this.coins
-                                +'&id_player='+this.player.id
-                                +'&played_time='+diff;
+        console.log("killPlayer");
+        let diff = Date.now() - this.DT_START;
+        diff = Math.floor(diff / 1000);
+
+
+
+        window.location.href = './game_end.php'+
+                                '?played_turns='+this.playedTurns+
+                                '&coins='+this.coins+
+                                '&id_hero='+this.player.id+
+                                '&played_time='+diff;
     }
 
 }
@@ -218,13 +223,18 @@ export class GameObject
     static DIR_LEFT = -2;
     static DIR_RIGHT = 2;
     static DIR_STR = null;
-    static DIR_V = [GameObject.DIR_UP,GameObject.DIR_DOWN,GameObject.DIR_RIGHT,GameObject.DIR_LEFT]
+    static DIR_V = [GameObject.DIR_UP,GameObject.DIR_RIGHT,GameObject.DIR_DOWN,GameObject.DIR_LEFT]
 
     static STOP_THE_PLAYER = [2,4];//stop the player
     static IS_WEAPON = [5];//weapon -> equip
     static IS_TARGET = [2];//enemy -> attack
     static IS_INTERACTABLE = [4];//interactable -> die
     static DIE_ON_HOVER = [6];//interactable -> die
+
+    static INTERACTION_DEFAULT = 0;
+    static INTERACTION_SWAP = 1;
+
+    static
 
     /**
      *@constructor
@@ -266,6 +276,8 @@ export class GameObject
         this._shields = 0;
         this._rotation = null;
         this._is_corroded = false;
+        this._interaction_type = this.INTERACTION_DEFAULT;
+        this.damage_multiplier = 1;
 
         if(id_type === 1 || id_type === 2){
             this._max_health = health;
@@ -274,7 +286,7 @@ export class GameObject
         }
 
 
-        this.executeEffects(2,this);
+        this.executeEffects(2, {"val":0,"owner":this,"target":null});
     }
     static convertObj(obj)
     {
@@ -324,6 +336,10 @@ export class GameObject
     {
         return this._spawn_indicator;
     }
+    get damage_multiplier()
+    {
+        return this._damage_multiplier;
+    }
     get owned()
     {
         return this._owned;
@@ -339,6 +355,10 @@ export class GameObject
     get is_corroded()
     {
         return this._is_corroded;
+    }
+    get interaction_type()
+    {
+        return this._interaction_type;
     }
     get shields()
     {
@@ -394,18 +414,18 @@ export class GameObject
         return this.max_health > this.health || !this.getType().have_max_health;
     }
     heal(val){
+        this.executeEffects(10, {"val":val,"owner":this,"target":null});//heal
         this.health += val;
         if(this.health > this._max_health && this.getType().have_max_health){
             this.health = this._max_health
         }
-        this.executeEffects(10, this);//heal
     }
     heal_overflow(val){
+        this.executeEffects(10, {"val":val,"owner":this,"target":null});//heal
         this.health += val;
         if(this.health > this._max_health && this.getType().have_max_health){
             this._max_health = this.health
         }
-        this.executeEffects(10, this);//heal
     }
     haveUses(){
         return this.uses !== undefined && this.uses !== 0;
@@ -436,7 +456,11 @@ export class GameObject
      * @param {GameObject} obj **/
     die(obj){
         let game = GameInstance.getInstance();
-        this.executeEffects(1,null);
+        this.executeEffects(1,{"val":0,"owner":this,"target":obj});
+        if(obj !== null){
+            obj.executeEffects(9,{"val":0,"owner":obj,"target":this});
+        }
+
 
         let cell = game.getCellByObj(this);
         if(cell !== null){//check if the obj is in the grid
@@ -444,8 +468,9 @@ export class GameObject
             console.log("kill the obj");
             if (this === game.player)
             {
+                console.log("the obj is player");
                 // Kill the player.
-
+                game.killPlayer();
             }
         }
     }
@@ -460,6 +485,19 @@ export class GameObject
             }
         }
     }
+    /**
+     * @param {int} val **/
+    setShield(val){
+        this.shields = val;
+        if(this.shields < 0){
+            this.shields = 0;
+        }
+    }
+    /**
+     * @param {int} val **/
+    addShield(val){
+        this.setShield(this.shields + val);
+    }
     decreaseUses(){
         if(this.haveUses()){
             this.setUses(this.uses - 1);
@@ -469,8 +507,8 @@ export class GameObject
      * @param {GameObject} source
      * @param {int} dmg **/
     takeNormalDamage(source, dmg){
-        this.executeEffects(17,this);//before dmg
-        this.executeEffects(18,this);//before normal dmg
+        this.executeEffects(17,{"val":dmg,"owner":this,"target":source});//before dmg
+        this.executeEffects(18,{"val":dmg,"owner":this,"target":source});//before normal dmg
         if(!this.haveShields()){
             this.health -= dmg;
             if(this.health < 0){
@@ -479,37 +517,48 @@ export class GameObject
         }else{
             this.shields--;
         }
-        this.executeEffects(3,this);//dmg taken
-        this.executeEffects(5,this);//normal dmg taken
+        this.executeEffects(3,{"val":dmg,"owner":this,"target":source});//dmg taken
+        this.executeEffects(5,{"val":dmg,"owner":this,"target":source});//normal dmg taken
     }
     /**
      * @param {GameObject} source
      * @param {int} dmg **/
     takeSpecialDamage(source, dmg){
-        this.executeEffects(17,this);//before dmg
-        this.executeEffects(19,this);//before special dmg
+        this.executeEffects(17,{"val":dmg,"owner":this,"target":source});//before dmg
+        this.executeEffects(19,{"val":dmg,"owner":this,"target":source});//before special dmg
         this.health -= dmg;
         if(this.health < 0){
             this.health = 0;
         }
-        this.executeEffects(3,this);//dmg taken
+        this.executeEffects(3,{"val":dmg,"owner":this,"target":source});//dmg taken
     }
     /**
      * @param {int} event
-     * @param v**/
+     * @param {{"val" : int,"owner" : GameObject,"target" : GameObject}} v**/
     executeEffects(event,v){
 
+        /*
         let game = GameInstance.getInstance();
         for (let i = 0; i < this.effects.length; i++){
             let eTmp = game.EFFECTS[this.effects[i]];
             if(eTmp.isPassive() && eTmp.id_event === event){//death
                 eTmp.execute(v);
             }
-        }
+        }*/
+    }
+    /**
+     * @param {boolean} val
+     * **/
+    setCorrosion(val){
+        let val2 = val ? 1 : 0;
+        this.executeEffects(15,{"val":val2,"owner":this,"target":null});
+        val = val2 === 1;
+        this.is_corroded = val;
     }
     applyCorrosion(){
-        this.is_corroded = true;
-        this.executeEffects(15,this);//effect applied
+        let val = 1;
+        this.executeEffects(15,{"val":val,"owner":this,"target":null});//effect applied
+        this.is_corroded = val === 1;
     }
     removeCorrosion(){
         this.is_corroded = false;
@@ -522,117 +571,130 @@ export class GameObject
         let cObj = game.getCoordinates(game.getCellByObj(obj));
         let cPlayer = game.getCoordinates(game.getCellByObj(game.player));
         if ((cObj[0] === cPlayer[0] || cObj[1] === cPlayer[1]) && obj !== game.player && Math.abs(cObj[0] - cPlayer[0]) < 2 && Math.abs(cObj[1] - cPlayer[1]) < 2){//legal move
-            if(!GameObject.STOP_THE_PLAYER.includes(this.id_type))//move
-            {
-                //get original player coords
-                let coord = game.getCoordinates(game.getCellByObj(game.player));
-                let x = coord[0];
-                let y = coord[1];
+            if(game.player.interaction_type === GameObject.INTERACTION_DEFAULT){
+                if(!GameObject.STOP_THE_PLAYER.includes(this.id_type))//move
+                {
+                    //get original player coords
+                    let coord = game.getCoordinates(game.getCellByObj(game.player));
+                    let x = coord[0];
+                    let y = coord[1];
 
-                //delete old player
-                game.getCellByObj(game.player).obj = game.getEmptyObj();
+                    //delete old player
+                    game.getCellByObj(game.player).obj = game.getEmptyObj();
 
-                //move the player
-                game.getCellByObj(this).obj = game.player;
-                coord = game.getCoordinates(game.getCellByObj(game.player));
-                let xEnd = coord[0];
-                let yEnd = coord[1];
+                    //move the player
+                    game.getCellByObj(this).obj = game.player;
+                    coord = game.getCoordinates(game.getCellByObj(game.player));
+                    let xEnd = coord[0];
+                    let yEnd = coord[1];
 
-                //find player movement dir
-                let move;
-                if(x === xEnd){
-                    if(yEnd > y){
-                        move = GameObject.DIR_DOWN;
+                    //find player movement dir
+                    let move;
+                    if(x === xEnd){
+                        if(yEnd > y){
+                            move = GameObject.DIR_DOWN;
+                        }else{
+                            move = GameObject.DIR_UP;
+                        }
                     }else{
-                        move = GameObject.DIR_UP;
+                        if(xEnd > x){
+                            move = GameObject.DIR_RIGHT;
+                        }else{
+                            move = GameObject.DIR_LEFT;
+                        }
                     }
-                }else{
-                    if(xEnd > x){
-                        move = GameObject.DIR_RIGHT;
-                    }else{
-                        move = GameObject.DIR_LEFT;
+
+                    //find direction for filling the empty spaces
+                    let dir;
+                    do{
+                        dir = GameObject.DIR_V[Math.floor(Math.random()*100) % GameObject.DIR_V.length];
+                    }while (dir === move);
+
+                    //move the objs and create new obj
+                    switch (dir){
+                        case GameObject.DIR_UP:
+                            for(let y2 = y; y2 > 0; y2--){
+                                game.gameGrid[x][y2].obj = game.gameGrid[x][y2-1].obj;
+                            }
+                            game.gameGrid[x][0].obj = game.createNewObject();
+                            break;
+                        case GameObject.DIR_DOWN:
+                            for(let y2 = y; y2 < game.gameGrid[0].length-1; y2++){
+                                game.gameGrid[x][y2].obj = game.gameGrid[x][y2+1].obj;
+                            }
+                            game.gameGrid[x][game.gameGrid[0].length-1].obj = game.createNewObject();
+                            break;
+                        case GameObject.DIR_RIGHT:
+                            for(let x2 = x; x2 < game.gameGrid.length-1; x2++){
+                                game.gameGrid[x2][y].obj = game.gameGrid[x2+1][y].obj;
+                            }
+                            game.gameGrid[game.gameGrid.length-1][y].obj = game.createNewObject();
+                            break;
+                        case GameObject.DIR_LEFT:
+                            for(let x2 = x; x2 > 0; x2--){
+                                game.gameGrid[x2][y].obj = game.gameGrid[x2-1][y].obj;
+                            }
+                            game.gameGrid[0][y].obj = game.createNewObject();
+                            break;
                     }
+
+
+                    //resolve hover
+                    if(GameObject.DIE_ON_HOVER.includes(this.id_type)){
+                        this.die(game.player);
+                    }else {
+                        this.executeEffects(14,{"val":0,"owner":this,"target":null});//normal interaction
+                    }
+
                 }
 
-                //find direction for filling the empty spaces
-                let dir;
-                do{
-                    dir = GameObject.DIR_V[Math.floor(Math.random()*100) % GameObject.DIR_V.length];
-                }while (dir === move);
-
-                //move the objs and create new obj
-                switch (dir){
-                    case GameObject.DIR_UP:
-                        for(let y2 = y; y2 > 0; y2--){
-                            game.gameGrid[x][y2].obj = game.gameGrid[x][y2-1].obj;
-                        }
-                        game.gameGrid[x][0].obj = game.createNewObject();
-                        break;
-                    case GameObject.DIR_DOWN:
-                        for(let y2 = y; y2 < game.gameGrid[0].length-1; y2++){
-                            game.gameGrid[x][y2].obj = game.gameGrid[x][y2+1].obj;
-                        }
-                        game.gameGrid[x][game.gameGrid[0].length-1].obj = game.createNewObject();
-                        break;
-                    case GameObject.DIR_RIGHT:
-                        for(let x2 = x; x2 < game.gameGrid.length-1; x2++){
-                            game.gameGrid[x2][y].obj = game.gameGrid[x2+1][y].obj;
-                        }
-                        game.gameGrid[game.gameGrid.length-1][y].obj = game.createNewObject();
-                        break;
-                    case GameObject.DIR_LEFT:
-                        for(let x2 = x; x2 > 0; x2--){
-                            game.gameGrid[x2][y].obj = game.gameGrid[x2-1][y].obj;
-                        }
-                        game.gameGrid[0][y].obj = game.createNewObject();
-                        break;
+                if(GameObject.IS_WEAPON.includes(this.id_type))//weapon
+                {
+                    game.playerWeapon.obj = this;
                 }
+                if(GameObject.IS_TARGET.includes(this.id_type))//target
+                {
+                    let weapon = game.playerWeapon.obj
+                    if(weapon != null){
+                        let val = weapon.health
+                        game.player.executeEffects(20,{"val":val,"owner":game.player,"target":this});//before dmg done
+                        game.player.executeEffects(21,{"val":val,"owner":game.player,"target":this});//before normal dmg done
+                        val *= game.player._damage_multiplier;
+                        game.player._damage_multiplier = 1;
+                        this.takeNormalDamage(game.player,val);
+                        weapon.decreaseUses();
+                    }else if(game.player.health > this.health){
+                        game.player.takeNormalDamage(game.player,this.health);
+                        this.health = 0;
+                    }else {
+                        this.takeNormalDamage(game.player,game.player.health);
+                        game.player.health = 0;
+                    }
+                    game.player.executeEffects(4,{"val":0,"owner":game.player,"target":this});//dmg done
+                    game.player.executeEffects(6,{"val":0,"owner":game.player,"target":this});//normal dmg done
 
 
-                //resolve hover
-                if(GameObject.DIE_ON_HOVER.includes(this.id_type)){
-                    this.die(game.player);
-                }else {
-                    this.executeEffects(14,this);//normal interaction
-                }
-
-            }
-
-            if(GameObject.IS_WEAPON.includes(this.id_type))//weapon
-            {
-                game.playerWeapon.obj = this;
-            }
-            if(GameObject.IS_TARGET.includes(this.id_type))//target
-            {
-                let weapon = game.playerWeapon.obj
-                game.player.executeEffects(20,this);//before dmg done
-                game.player.executeEffects(21,this);//before normal dmg done
-                if(weapon != null){
-                    this.takeNormalDamage(game.player,weapon.health);
-                    weapon.decreaseUses();
-                    if (weapon.uses <= 0){
+                    if (game.playerWeapon.obj !== null && game.playerWeapon.obj.uses <= 0){
                         game.playerWeapon.obj = null;
                     }
-                }else if(game.player.health > this.health){
-                    game.player.takeNormalDamage(game.player,this.health);
-                    this.health = 0;
-                }else {
-                    this.takeNormalDamage(game.player,game.player.health);
-                    game.player.health = 0;
+
+                    //console.log(this.health);
+
                 }
-                game.player.executeEffects(4,this);//dmg done
-                game.player.executeEffects(6,this);//normal dmg done
-
-                if(this.health <= 0){
-                    game.player.executeEffects(7,this);//normal dmg done
+                if(GameObject.IS_INTERACTABLE.includes(this.id_type))//interactable
+                {
+                    this.die(game.player);
                 }
-
-                //console.log(this.health);
-
             }
-            if(GameObject.IS_INTERACTABLE.includes(this.id_type))//interactable
-            {
-                this.die(game.player);
+            else if(game.player.interction_type === GameObject.INTERACTION_SWAP){
+                let cell1 = game.getCellByObj(this);
+                let cell2 = game.getCellByObj(game.player);
+                cell1.obj = game.player;
+                cell2.obj = this;
+            }
+
+            if(this.interaction_type !== GameObject.INTERACTION_DEFAULT){
+                this.interaction_type = GameObject.INTERACTION_DEFAULT;
             }
 
 
@@ -710,10 +772,7 @@ export class Effect
                 break
             case 6:
                 this.execute = (v) => {
-                    let cell1 = game.getCellByObj(v["target"]);
-                    let cell2 = game.getCellByObj(v["owner"]);
-                    cell1.obj = v["owner"];
-                    cell2.obj = v["target"];
+                    v["owner"].interaction_type = GameObject.INTERACTION_SWAP;
                 }
                 break
             case 7:
@@ -725,7 +784,7 @@ export class Effect
                 break
             case 8:
                 this.execute = (v) => {
-                    v["val"] *= this.value;
+                    v["owner"].damage_multiplier = this.value;
                 }
                 break
             case 9:
@@ -746,7 +805,7 @@ export class Effect
                 break
             case 12:
                 this.execute = (v) => {
-                    v["target"]._is_corroded = ture;
+                    v["target"].setCorrosion(true);
                 }
                 break
             case 13:
@@ -805,6 +864,79 @@ export class Effect
             case 20:
                 this.execute = (v) => {
                     v["owner"]._is_corroded = true;
+                }
+                break
+            case 21:
+                this.execute = (v) => {
+                    v["owner"].decreaseUses();
+                }
+                break
+            case 23:
+                this.execute = (v) => {
+                    v["val"] = 0;
+                }
+                break
+            case 24:
+                this.execute = (v) => {
+                    v["target"].setCorrosion(true);
+                }
+                break
+            case 25:
+                this.execute = (v) => {
+                    v["target"].heal(this.value);
+                }
+                break
+            case 26:
+                this.execute = (v) => {
+                    game.coins += this.value;
+                }
+                break
+            case 27:
+                this.execute = (v) => {
+                    if(!v["owner"].haveShields()){
+                        v["owner"].addShield(this.value);
+                    }
+                }
+                break
+            case 28:
+                this.execute = (v) => {
+                    v["owner"].heal(this.value);
+                }
+                break
+            case 29:
+                this.execute = (v) => {
+                    v["owner"].rotation = GameObject.DIR_V[Math.random()*100%GameObject.DIR_V.length];
+                }
+                break
+            case 30:
+                this.execute = (v) => {
+                    v["target"].takeNormalDamage(v["owner"],this.value);
+                }
+                break
+            case 31:
+                this.execute = (v) => {
+                    let found = false;
+                    for(let i = 0; i < GameObject.DIR_V.length && !found;i++){
+                        if(v["owner"].rotation === GameObject.DIR_V[i]){
+                            v["owner"].rotation = GameObject.DIR_V[(i+1)%GameObject.DIR_V.length]
+                            found = true;
+                        }
+
+                    }
+
+                }
+                break
+            case 32:
+                this.execute = (v) => {
+                    let found = false;
+                    for(let i = 0; i < GameObject.DIR_V.length && !found;i++){
+                        if(v["owner"].rotation === GameObject.DIR_V[i]){
+                            v["owner"].rotation = GameObject.DIR_V[(i-1+GameObject.DIR_V.length)%GameObject.DIR_V.length]
+                            found = true;
+                        }
+
+                    }
+
                 }
                 break
             default:

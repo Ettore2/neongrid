@@ -196,8 +196,8 @@ INSERT into effect (name, description, value, id_event) VALUES
 ("laser trap deactivation","deactivate next turn",29,12),
 ("detonation","when it dies it explodes dealing as much damage as its health to adjacent cells",4,1),
 ("corrosive","give corrosion to the target",1,4),
-("temporary-3","expire after 3 turns",3,12),
-("temporary-4","expire after 4 turns",4,12),
+("temporary","decrease the uses every turn",1,12),
+("*unused*","*unused*",4,12),
 ("toxins immunity","immune to corrosion",0,15),
 ("poisonous","give corrosion",1,14),
 ("healing","heal",0,14),
@@ -213,9 +213,12 @@ INSERT into effect (name, description, value, cd, id_event,is_shown) VALUES
 INSERT into have_effect (id_object, id_effect) VALUES
 (1,1),(1,2),(2,3),(2,4),(3,5),(3,6),(4,7),(4,8);
 INSERT into have_effect (id_object, id_effect) VALUES
-(6,9),(8,10),(9,11),(9,12),(9,23),(10,13),(11,14),(12,15),(19,11),(20,16),(25,20),(26,20),(29,18),(30,19),(31,22),(32,21),(32,24),(13,26),(14,26),(15,25),(16,25),(17,24),(18,24);
+(6,9),(8,10),(9,11),(9,12),(9,23),(10,13),(11,14),(12,15),(19,11),(20,16),(25,20),(26,20),(29,18),(30,19),(31,21),(31,19),(32,21),(32,24),(13,26),(14,26),(15,25),(16,25),(17,24),(18,24);
 INSERT into have_effect (id_object, id_effect) VALUES
 (34,27),(34,28),(35,29),(35,30),(35,31),(36,29),(36,30),(36,32);
 
 INSERT into have_hero (id_user, id_hero) VALUES
 (1,1),(1,2),(1,4),(2,2),(2,3);
+
+INSERT into version (description) VALUES
+("0.0.1");

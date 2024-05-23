@@ -44,7 +44,7 @@ check_login();
         sessionStorage.setItem('curr_hero_id', <?=$_POST["hero_id"]?>);
 
         const game = GameInstance.getInstance();
-        game.DT_START = Date.now;
+        game.DT_START = Date.now();
 
         game.coins = 0;
         //console.log("game.EFFECTS");

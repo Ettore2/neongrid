@@ -115,7 +115,7 @@ graphicUpdate();
 document.querySelector('#quit-btn').addEventListener('click', () =>
 {
     //suicide the hero
-    game.player.killPlayer();
+    game.player.die(null);
 
 
 

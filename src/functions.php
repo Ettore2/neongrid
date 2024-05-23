@@ -320,3 +320,21 @@ function updateUserCoins(mysqli $connect, string $email,int $coins):void
     $stmt->bind_param("is", $coins, $email);
     $stmt->execute();
 }
+
+function getLatestVersion(mysqli $connect):array
+{
+    $sql = "SELECT MAX(id) as id, description FROM version ";
+    $stmt = $connect->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = mysqli_fetch_assoc($result);
+    $arr = array();
+    $arr['id'] = $row['id'];
+    $arr['description'] = $row['description'];
+    return $arr;
+}
+
+function getBestRun(mysqli $connect, string $email)
+{
+    $sql = "SELECT * FROM run ORDER BY turns LIMIT 1";
+}

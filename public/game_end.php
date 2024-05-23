@@ -1,8 +1,36 @@
 <?php
 /* It is the page of conclusion of a game. */
 require_once ('../includes/session.php');
+require_once ('../src/functions.php');
+require_once ('../config/connect.php');
+
 check_login();
 ?>
+
+<?php
+
+    /** GET THE DATA **/
+    $id_user = getUserIdFromEmail(CONN, $_SESSION[SESSION_EMAIL]);
+    $id_hero = (int)$_GET['id_hero'];
+    $played_turns = (int)$_GET['played_turns'];
+    $coins = (int)$_GET['coins'];
+    $played_time = (int)$_GET['played_time'];
+    $version = getLatestVersion(CONN);
+
+
+    /*
+    echo 'ID USER: '.$id_user.'<br>';
+    echo 'ID HERO: '.$id_hero.'<br>';
+    echo 'PLAYED TURNS: '.$played_turns.'<br>';
+    echo 'COINS: '.$coins.'<br>';
+    echo 'PLAYED TIME: '.$played_time.'<br>';
+    echo 'ID VERSION: '.$version["id"].'<br>';
+    echo 'VERSION NOTES: '.$version["description"].'<br>';
+    */
+
+?>
+
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -34,8 +62,6 @@ check_login();
 </head>
 <body style="background-image: url('assets/images/backgrounds/bgDeath.jpg'); background-repeat: no-repeat; background-size: cover;">
 <script type="module">
-
-    let data = new URLSearchParams();
 
 </script>
 <section class="vh-100 bg-image">
