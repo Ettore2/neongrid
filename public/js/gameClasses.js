@@ -42,6 +42,7 @@ export class GameInstance
         //get heroes
         for(let i = 0; i < obj.length; i++)
         {
+            //console.log(obj[i]);
             this.HEROES.push(GameObject.convertObj(obj[i]));
         }
     }
@@ -169,7 +170,7 @@ export class GameInstance
     }
     createNewObjectOfType(type)
     {
-        console.log('Type: '+type);
+        //console.log('Type: '+type);
         //get probability
         let probability = 0;
         let objsOfChoice = this.gameObjects[type.id];
@@ -201,7 +202,7 @@ export class GameInstance
      * Kills the player **/
     killPlayer()
     {
-        console.log("killPlayer");
+        //console.log("killPlayer");
         let diff = Date.now() - this.DT_START;
         diff = Math.floor(diff / 1000);
 
@@ -234,7 +235,6 @@ export class GameObject
     static INTERACTION_DEFAULT = 0;
     static INTERACTION_SWAP = 1;
 
-    static
 
     /**
      *@constructor
@@ -273,11 +273,12 @@ export class GameObject
         this._price = price;
         this._uses = uses;
 
+        //console.log(effects === null);
         this._shields = 0;
         this._rotation = null;
         this._is_corroded = false;
-        this._interaction_type = this.INTERACTION_DEFAULT;
-        this.damage_multiplier = 1;
+        this._interaction_type = GameObject.INTERACTION_DEFAULT;
+        this._damage_multiplier = 1;
 
         if(id_type === 1 || id_type === 2){
             this._max_health = health;
@@ -465,10 +466,10 @@ export class GameObject
         let cell = game.getCellByObj(this);
         if(cell !== null){//check if the obj is in the grid
             cell.obj = game.getEmptyObj();
-            console.log("kill the obj");
+            //console.log("kill the obj");
             if (this === game.player)
             {
-                console.log("the obj is player");
+                //console.log("the obj is player");
                 // Kill the player.
                 game.killPlayer();
             }
@@ -565,13 +566,16 @@ export class GameObject
     }
     click()
     {
+        //console.log("click");
         let game = GameInstance.getInstance();
         //get actors
         let obj = this;
         let cObj = game.getCoordinates(game.getCellByObj(obj));
         let cPlayer = game.getCoordinates(game.getCellByObj(game.player));
         if ((cObj[0] === cPlayer[0] || cObj[1] === cPlayer[1]) && obj !== game.player && Math.abs(cObj[0] - cPlayer[0]) < 2 && Math.abs(cObj[1] - cPlayer[1]) < 2){//legal move
+            //console.log("legal move");
             if(game.player.interaction_type === GameObject.INTERACTION_DEFAULT){
+                //console.log("default");
                 if(!GameObject.STOP_THE_PLAYER.includes(this.id_type))//move
                 {
                     //get original player coords
@@ -686,7 +690,8 @@ export class GameObject
                     this.die(game.player);
                 }
             }
-            else if(game.player.interction_type === GameObject.INTERACTION_SWAP){
+            else if(game.player.interaction_type === GameObject.INTERACTION_SWAP){
+                //console.log("switch");
                 let cell1 = game.getCellByObj(this);
                 let cell2 = game.getCellByObj(game.player);
                 cell1.obj = game.player;
@@ -694,7 +699,7 @@ export class GameObject
             }
 
             if(this.interaction_type !== GameObject.INTERACTION_DEFAULT){
-                this.interaction_type = GameObject.INTERACTION_DEFAULT;
+                this._interaction_type = GameObject.INTERACTION_DEFAULT;
             }
 
 

@@ -1,6 +1,7 @@
 import {GameInstance,GameObject} from "./gameClasses.js";
 const game = GameInstance.getInstance()
 const HEROES = game.HEROES;
+const EFFECTS = game.EFFECTS;
 const card1 = document.getElementById('hero-card-1');
 const card2 = document.getElementById('hero-card-2');
 const card3 = document.getElementById('hero-card-3');
@@ -20,7 +21,7 @@ let heroIndex = parseInt(sessionStorage.getItem('curr_hero_id'));
 
 document.getElementById("coins-text").innerText = game.coins;
 
-console.log(HEROES);
+//console.log(HEROES);
 //console.log(EFFECTS);
 
 
