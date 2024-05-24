@@ -18,6 +18,8 @@ check_login();
     $version = getLatestVersion(CONN);
 
 
+
+
     /*
     echo 'ID USER: '.$id_user.'<br>';
     echo 'ID HERO: '.$id_hero.'<br>';

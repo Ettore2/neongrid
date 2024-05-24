@@ -152,7 +152,7 @@ export class GameInstance
             }
         }
 
-        return this.createNewObjectOfType(type);
+        return this.createNewObjectOfType(type.id);
     }
     /**
      * @param {int} id
@@ -160,7 +160,7 @@ export class GameInstance
     getNewObject(id)
     {
         for (let i = 0; i < this.OBJECTS.length; i++){
-            if(this.OBJECTS[i].id() === id){
+            if(this.OBJECTS[i].id === id){
                 return GameObject.convertObj(this.OBJECTS[i]);
             }
         }
@@ -168,12 +168,12 @@ export class GameInstance
 
         return null;
     }
-    createNewObjectOfType(type)
+    createNewObjectOfType(id_type)
     {
-        //console.log('Type: '+type);
+        console.log('Type: '+id_type);
         //get probability
         let probability = 0;
-        let objsOfChoice = this.gameObjects[type.id];
+        let objsOfChoice = this.gameObjects[id_type];
         //console.log(objsOfChoice);
         for(let i = 0; i < objsOfChoice.length; i++){
             probability += objsOfChoice[i].spawn_indicator;
@@ -205,6 +205,7 @@ export class GameInstance
         //console.log("killPlayer");
         let diff = Date.now() - this.DT_START;
         diff = Math.floor(diff / 1000);
+
 
 
 
@@ -369,6 +370,14 @@ export class GameObject
     {
         this._shields = shields;
     }
+    set rotation(rotation)
+    {
+        this._rotation = rotation;
+    }
+    set is_corroded(corroded)
+    {
+        this._is_corroded = corroded;
+    }
 
 
     // Methods
@@ -418,8 +427,10 @@ export class GameObject
         this.executeEffects(10, {"val":val,"owner":this,"target":null});//heal
         this.health += val;
         if(this.health > this._max_health && this.getType().have_max_health){
-            this.health = this._max_health
+            this.health = this._max_health;
         }
+
+        this.setCorrosion(false);
     }
     heal_overflow(val){
         this.executeEffects(10, {"val":val,"owner":this,"target":null});//heal
@@ -528,24 +539,10 @@ export class GameObject
         this.executeEffects(17,{"val":dmg,"owner":this,"target":source});//before dmg
         this.executeEffects(19,{"val":dmg,"owner":this,"target":source});//before special dmg
         this.health -= dmg;
-        if(this.health < 0){
-            this.health = 0;
+        if(this.health <= 0){
+            this.health = 1;
         }
         this.executeEffects(3,{"val":dmg,"owner":this,"target":source});//dmg taken
-    }
-    /**
-     * @param {int} event
-     * @param {{"val" : int,"owner" : GameObject,"target" : GameObject}} v**/
-    executeEffects(event,v){
-
-        /*
-        let game = GameInstance.getInstance();
-        for (let i = 0; i < this.effects.length; i++){
-            let eTmp = game.EFFECTS[this.effects[i]];
-            if(eTmp.isPassive() && eTmp.id_event === event){//death
-                eTmp.execute(v);
-            }
-        }*/
     }
     /**
      * @param {boolean} val
@@ -563,6 +560,20 @@ export class GameObject
     }
     removeCorrosion(){
         this.is_corroded = false;
+    }
+    /**
+     * @param {int} event
+     * @param {{"val" : int,"owner" : GameObject,"target" : GameObject}} v**/
+    executeEffects(event,v){
+
+        /**/
+        let game = GameInstance.getInstance();
+        for (let i = 0; i < this.effects.length; i++){
+            let eTmp = game.EFFECTS[this.effects[i]];
+            if(eTmp.isPassive() && eTmp.id_event === event){//death
+                eTmp.execute(v);
+            }
+        }
     }
     click()
     {
@@ -644,10 +655,9 @@ export class GameObject
 
 
                     //resolve hover
-                    if(GameObject.DIE_ON_HOVER.includes(this.id_type)){
+                    this.executeEffects(14,{"val":0,"owner":this,"target":game.player});//normal interaction
+                    if(GameObject.DIE_ON_HOVER.includes(this.id_type)) {
                         this.die(game.player);
-                    }else {
-                        this.executeEffects(14,{"val":0,"owner":this,"target":null});//normal interaction
                     }
 
                 }
@@ -832,19 +842,24 @@ export class Effect
             case 16:
                 this.execute = (v) => {
                     let cell = game.getCellByObj(v["owner"]);
+                    //console.log(this);
                     cell.obj = game.createNewObjectOfType(this.value);
                 }
                 break
             case 17:
                 this.execute = (v) => {
                     let cell = game.getCellByObj(v["owner"]);
-                    cell.obj = game.createNewObjectOfType(this.value);
+                    let health = v["owner"].health;
+                    cell.obj = game.getNewObject(this.value);
+                    cell.obj._health = health;
                 }
                 break
             case 18:
                 this.execute = (v) => {
                     let cell = game.getCellByObj(v["owner"]);
-                    cell.obj = game.createNewObjectOfType(this.value);
+                    let health = v["owner"].health;
+                    cell.obj = game.getNewObject(this.value);
+                    cell.obj._health = health;
                 }
                 break
             case 19:
@@ -874,6 +889,9 @@ export class Effect
             case 21:
                 this.execute = (v) => {
                     v["owner"].decreaseUses();
+                    if(!v["owner"].haveUses()){
+                        v["owner"].die(null);
+                    }
                 }
                 break
             case 23:
@@ -888,7 +906,7 @@ export class Effect
                 break
             case 25:
                 this.execute = (v) => {
-                    v["target"].heal(this.value);
+                    v["target"].heal(v["owner"].health);
                 }
                 break
             case 26:
@@ -1079,7 +1097,7 @@ export class GameCell
         //console.log(this._card.children);
 
         let elements = this._card.children;
-        elements[0].innerHTML =  this.obj.name;
+        elements[0].innerHTML = this.obj.name + (this.obj.is_corroded ? " #" : "");
         elements[1].src = "assets/images/cards/" + this.obj.img;
 
         elements = elements[2].children;

@@ -29,35 +29,48 @@ for (let i = 0; i < game.gameCards.length; i++)
         let obj = game.getCellByCard(getFather(e.target)).obj;
         if(obj.click()){
             game.playedTurns++;
-            if(game.player.health === 0){
-                game.player.die(obj)
-            }
 
             for(let x = 0; x < game.gameGrid.length; x++){
                 for(let y = 0; y < game.gameGrid[x].length; y++){
                     if(game.gameGrid[x][y].obj.is_corroded){
                         game.gameGrid[x][y].obj.takeSpecialDamage(null,1);
-                        game.gameGrid[x][y].obj.executeEffects(7,this);//special damage taken
+                        game.gameGrid[x][y].obj.executeEffects(7,{"val":0,"owner":game.gameGrid[x][y].obj,"target":game.player});//special damage taken
                     }
                 }
             }
 
             for(let x = 0; x < game.gameGrid.length; x++){
                 for(let y = 0; y < game.gameGrid[x].length; y++){
-                    game.gameGrid[x][y].obj.executeEffects(12,this);//normal turn end
+                    game.gameGrid[x][y].obj.executeEffects(12,{"val":0,"owner":game.gameGrid[x][y].obj,"target":game.player});//normal turn end
                 }
             }
             for(let x = 0; x < game.gameGrid.length; x++){
                 for(let y = 0; y < game.gameGrid[x].length; y++){
-                    game.gameGrid[x][y].obj.executeEffects(13,this);//normal turn start
+                    game.gameGrid[x][y].obj.executeEffects(13,{"val":0,"owner":game.gameGrid[x][y].obj,"target":game.player});//normal turn start
                 }
             }
             for(let x = 0; x < game.gameGrid.length; x++){
                 for(let y = 0; y < game.gameGrid[x].length; y++){
-                    game.gameGrid[x][y].obj.executeEffects(16,this);//normal turn play
+                    game.gameGrid[x][y].obj.executeEffects(16,{"val":0,"owner":game.gameGrid[x][y].obj,"target":game.player});//normal turn play
                 }
             }
 
+            //check deaths
+            for(let x = 0; x < game.gameGrid.length; x++){
+                for(let y = 0; y < game.gameGrid[x].length; y++){
+                    if(game.gameGrid[x][y].obj.health <= 0){
+                        game.gameGrid[x][y].obj.die(null);
+                    }
+                }
+            }
+            /*
+            for(let x = 0; x < game.gameGrid.length; x++){
+                for(let y = 0; y < game.gameGrid[x].length; y++){
+                    if(game.gameGrid[x][y].obj.haveUses() && game.gameGrid[x][y].obj.uses <= 0){
+                        game.gameGrid[x][y].obj.die(null)
+                    }
+                }
+            }*/
 
             graphicUpdate()
         }

@@ -334,7 +334,68 @@ function getLatestVersion(mysqli $connect):array
     return $arr;
 }
 
-function getBestRun(mysqli $connect, string $email)
+function getBestRun(mysqli $connect, string $email, int $id_version): false|array|null
 {
-    $sql = "SELECT * FROM run ORDER BY turns LIMIT 1";
+    $sql = "
+    SELECT * 
+    FROM run
+    WHERE email = ? 
+    AND
+    id_version = ?
+    ORDER BY turns DESC
+    LIMIT 1";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("si", $email,$id_version);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return mysqli_fetch_assoc($result);
+}
+
+function updateRun(mysqli $connect, int $id_hero, int $turns, int $coins, int $duration, int $id_version, int $idBest): void
+{
+    $sql = "
+            UPDATE run 
+            SET id_hero = ?, turns = ?, coins = ?, duration = ?, id_version = ?
+            WHERE id = ?";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param('iiiiii',$id_hero,$turns,$coins,$duration,$id_version,$idBest);
+    $stmt->execute();
+
+}
+
+function getRuns(mysqli $connect, int $id_user): false|array|null
+{
+    $sql = "
+            SELECT * 
+            FROM run
+            WHERE id_user = ?
+            ORDER BY turns DESC";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("i",$id_user);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return mysqli_fetch_assoc($result);
+}
+
+function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $coins, int $duration, int $id_version, $email):void
+{
+    $data = getBestRun($connect, $email, $id_version);
+    if (($data !== FALSE) && $data["turns"] <= $turns)
+    {
+        // UPDATE THE BEST RUN
+        updateRun($connect,$id_hero,$turns,$coins,$duration,$id_version,$data["id"]);
+    }
+    else
+    {
+        // INSERT THE BEST RUN
+        $sql = "
+                INSERT 
+                INTO run 
+                (id_user, id_hero, turns, coins, duration, id_version)
+                VALUES (?,?,?,?,?,?)
+        ";
+        $stmt = $connect->prepare($sql);
+        $stmt->bind_param("iiiiii",$id_user,$id_hero,$turns,$coins,$duration,$id_version);
+        $stmt->execute();
+    }
 }

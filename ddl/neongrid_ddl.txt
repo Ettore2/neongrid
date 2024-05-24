@@ -161,7 +161,7 @@ INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
 ("toxic knife",2,1,"toxic_knife.jpeg",5,4),
 ("toxic gun",3,2,"toxic_gun.jpeg",5,1),
 ("laser sword",4,3,"laser_sword.jpeg",5,10),
-("shotgun",8,2,"knife.jpeg",5,4);
+("shotgun",8,2,"shotgun.jpeg",5,4);
 INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
 ("lasers",2,null,"lasers_on.jpeg",6,10),
 ("lasers",2,null,"lasers_off.jpeg",6,10),
@@ -179,7 +179,7 @@ INSERT into effect (name, description, value, cd, id_event) VALUES
 ("pocket knife","gain a 4*1 knife",21,6,null),
 ("beefed out","potions cure 2 hp extra",2,0,10),
 ("upgrade","increase by 1 the power of all adjacent cells",1,7,null),
-("agile","immune to traps",0,0,2),
+("agile","immune to traps damage",0,0,3),
 ("swap","change place with an adjacent cell",0,3,null),
 ("furious","do not consume the weapon on a kill",1,0,9),
 ("critical hit","the next attack deal 2x damage",2,7,4);
@@ -191,7 +191,7 @@ INSERT into effect (name, description, value, id_event) VALUES
 ("wealthy","spawn coins when killed",13,1),
 ("spikes","deal 1 damage back when attacked",1,5),
 ("damage absorption","take 1 less damage from all sources except corrosion",1,5),
-("armed","spawn a weapon when killed",3,1),
+("armed","spawn a weapon when killed",5,1),
 ("laser trap activation","activate next turn",30,12),
 ("laser trap deactivation","deactivate next turn",29,12),
 ("detonation","when it dies it explodes dealing as much damage as its health to adjacent cells",4,1),
