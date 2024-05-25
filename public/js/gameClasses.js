@@ -170,7 +170,7 @@ export class GameInstance
     }
     createNewObjectOfType(id_type)
     {
-        console.log('Type: '+id_type);
+        //console.log('Type: '+id_type);
         //get probability
         let probability = 0;
         let objsOfChoice = this.gameObjects[id_type];
@@ -225,6 +225,7 @@ export class GameObject
     static DIR_LEFT = -2;
     static DIR_RIGHT = 2;
     static DIR_STR = null;
+    static DIR_EMOJI = null;
     static DIR_V = [GameObject.DIR_UP,GameObject.DIR_RIGHT,GameObject.DIR_DOWN,GameObject.DIR_LEFT]
 
     static STOP_THE_PLAYER = [2,4];//stop the player
@@ -261,6 +262,14 @@ export class GameObject
             GameObject.DIR_STR[GameObject.DIR_LEFT] = "left";
             GameObject.DIR_STR[GameObject.DIR_RIGHT] = "right";
         }
+        if(GameObject.DIR_EMOJI === null)
+        {
+            GameObject.DIR_EMOJI = Array();
+            GameObject.DIR_EMOJI[GameObject.DIR_UP] = "↑";
+            GameObject.DIR_EMOJI[GameObject.DIR_DOWN] = "↓";
+            GameObject.DIR_EMOJI[GameObject.DIR_LEFT] = "←";
+            GameObject.DIR_EMOJI[GameObject.DIR_RIGHT] = "→";
+        }
 
         this._id = id;
         this._id_type = id_type;
@@ -275,6 +284,7 @@ export class GameObject
         this._uses = uses;
 
         //console.log(effects === null);
+        this._alive = true;
         this._shields = 0;
         this._rotation = null;
         this._is_corroded = false;
@@ -424,8 +434,9 @@ export class GameObject
         return this.max_health > this.health || !this.getType().have_max_health;
     }
     heal(val){
-        this.executeEffects(10, {"val":val,"owner":this,"target":null});//heal
-        this.health += val;
+        let v = {"val":val,"owner":this,"target":null};
+        this.executeEffects(10, v);//heal
+        this.health += v["val"];
         if(this.health > this._max_health && this.getType().have_max_health){
             this.health = this._max_health;
         }
@@ -433,8 +444,9 @@ export class GameObject
         this.setCorrosion(false);
     }
     heal_overflow(val){
-        this.executeEffects(10, {"val":val,"owner":this,"target":null});//heal
-        this.health += val;
+        let v = {"val":val,"owner":this,"target":null};
+        this.executeEffects(10, v);//heal
+        this.health += v["val"];
         if(this.health > this._max_health && this.getType().have_max_health){
             this._max_health = this.health
         }
@@ -467,23 +479,30 @@ export class GameObject
     /**
      * @param {GameObject} obj **/
     die(obj){
-        let game = GameInstance.getInstance();
-        this.executeEffects(1,{"val":0,"owner":this,"target":obj});
-        if(obj !== null){
-            obj.executeEffects(9,{"val":0,"owner":obj,"target":this});
-        }
-
-
-        let cell = game.getCellByObj(this);
-        if(cell !== null){//check if the obj is in the grid
-            cell.obj = game.getEmptyObj();
-            //console.log("kill the obj");
-            if (this === game.player)
-            {
-                //console.log("the obj is player");
-                // Kill the player.
-                game.killPlayer();
+        if(this._alive){
+            let game = GameInstance.getInstance();
+            this.executeEffects(1,{"val":0,"owner":this,"target":obj});
+            console.log("executeEffects(1)");
+            if(obj !== null){
+                obj.executeEffects(9,{"val":0,"owner":obj,"target":this});
             }
+
+
+            let cell = game.getCellByObj(this);
+            if(cell !== null){//check if the obj is in the grid
+                cell.obj = game.getEmptyObj();
+                //console.log("kill the obj");
+                if (this === game.player)
+                {
+                    //console.log("the obj is player");
+                    // Kill the player.
+                    game.killPlayer();
+                }
+            }
+            if(game.playerWeapon.obj === this){
+                game.playerWeapon.obj = null;
+            }
+            this._alive = false;
         }
     }
     /**
@@ -491,7 +510,7 @@ export class GameObject
     setUses(val){
         if(this.haveUses() ){
             this._uses = val;
-            if(val < 0){
+            if(val <= 0){
                 this._uses = 0;
                 this.die(null);
             }
@@ -519,44 +538,53 @@ export class GameObject
      * @param {GameObject} source
      * @param {int} dmg **/
     takeNormalDamage(source, dmg){
-        this.executeEffects(17,{"val":dmg,"owner":this,"target":source});//before dmg
-        this.executeEffects(18,{"val":dmg,"owner":this,"target":source});//before normal dmg
+        let v = {"val":dmg,"owner":this,"target":source}
+        //console.log(v["val"]);
+        this.executeEffects(17,v);//before dmg
+        this.executeEffects(18,v);//before normal dmg
+        //console.log(v["val"]);
         if(!this.haveShields()){
-            this.health -= dmg;
+            this.health -= v["val"];
             if(this.health < 0){
                 this.health = 0;
             }
         }else{
             this.shields--;
         }
-        this.executeEffects(3,{"val":dmg,"owner":this,"target":source});//dmg taken
-        this.executeEffects(5,{"val":dmg,"owner":this,"target":source});//normal dmg taken
+        if(v["val"] > 0){
+            this.executeEffects(3,v);//dmg taken
+            this.executeEffects(5,v);//normal dmg taken
+        }
     }
     /**
      * @param {GameObject} source
      * @param {int} dmg **/
     takeSpecialDamage(source, dmg){
-        this.executeEffects(17,{"val":dmg,"owner":this,"target":source});//before dmg
-        this.executeEffects(19,{"val":dmg,"owner":this,"target":source});//before special dmg
-        this.health -= dmg;
-        if(this.health <= 0){
-            this.health = 1;
+        if(this.health > 1){
+            let v = {"val":dmg,"owner":this,"target":source}
+            this.executeEffects(17,v);//before dmg
+            this.executeEffects(19,v);//before special dmg
+            if(v["val"] > 0){
+                this.health -= v["val"];
+                if(this.health <= 0){
+                    this.health = 0;
+                }
+                this.executeEffects(3,v);//dmg taken
+
+            }
         }
-        this.executeEffects(3,{"val":dmg,"owner":this,"target":source});//dmg taken
+
     }
     /**
      * @param {boolean} val
      * **/
     setCorrosion(val){
-        let val2 = val ? 1 : 0;
-        this.executeEffects(15,{"val":val2,"owner":this,"target":null});
-        val = val2 === 1;
-        this.is_corroded = val;
+        let v = {"val":(val ? 1 : 0),"owner":this,"target":null}
+        this.executeEffects(15,v);
+        this.is_corroded = v["val"];
     }
     applyCorrosion(){
-        let val = 1;
-        this.executeEffects(15,{"val":val,"owner":this,"target":null});//effect applied
-        this.is_corroded = val === 1;
+        this.setCorrosion(true);
     }
     removeCorrosion(){
         this.is_corroded = false;
@@ -586,19 +614,25 @@ export class GameObject
         if ((cObj[0] === cPlayer[0] || cObj[1] === cPlayer[1]) && obj !== game.player && Math.abs(cObj[0] - cPlayer[0]) < 2 && Math.abs(cObj[1] - cPlayer[1]) < 2){//legal move
             //console.log("legal move");
             if(game.player.interaction_type === GameObject.INTERACTION_DEFAULT){
-                //console.log("default");
                 if(!GameObject.STOP_THE_PLAYER.includes(this.id_type))//move
                 {
-                    //get original player coords
+                    //get movement infos player coords
                     let coord = game.getCoordinates(game.getCellByObj(game.player));
                     let x = coord[0];
                     let y = coord[1];
+                    let endCell = game.getCellByObj(this);
+
+
+                    //resolve hover
+                    this.executeEffects(14,{"val":0,"owner":this,"target":game.player});//normal interaction
+                    if(GameObject.DIE_ON_HOVER.includes(this.id_type)) {
+                        this.die(game.player);
+                    }
 
                     //delete old player
                     game.getCellByObj(game.player).obj = game.getEmptyObj();
-
                     //move the player
-                    game.getCellByObj(this).obj = game.player;
+                    endCell.obj = game.player;
                     coord = game.getCoordinates(game.getCellByObj(game.player));
                     let xEnd = coord[0];
                     let yEnd = coord[1];
@@ -654,14 +688,10 @@ export class GameObject
                     }
 
 
-                    //resolve hover
-                    this.executeEffects(14,{"val":0,"owner":this,"target":game.player});//normal interaction
-                    if(GameObject.DIE_ON_HOVER.includes(this.id_type)) {
-                        this.die(game.player);
-                    }
 
                 }
 
+                //console.log("default");
                 if(GameObject.IS_WEAPON.includes(this.id_type))//weapon
                 {
                     game.playerWeapon.obj = this;
@@ -670,12 +700,12 @@ export class GameObject
                 {
                     let weapon = game.playerWeapon.obj
                     if(weapon != null){
-                        let val = weapon.health
-                        game.player.executeEffects(20,{"val":val,"owner":game.player,"target":this});//before dmg done
-                        game.player.executeEffects(21,{"val":val,"owner":game.player,"target":this});//before normal dmg done
-                        val *= game.player._damage_multiplier;
+                        let v = {"val":weapon.health,"owner":game.player,"target":this}
+                        game.player.executeEffects(20,v);//before dmg done
+                        game.player.executeEffects(21,v);//before normal dmg done
+                        v["val"] *= game.player._damage_multiplier;
                         game.player._damage_multiplier = 1;
-                        this.takeNormalDamage(game.player,val);
+                        this.takeNormalDamage(game.player,v["val"]);
                         weapon.decreaseUses();
                     }else if(game.player.health > this.health){
                         game.player.takeNormalDamage(game.player,this.health);
@@ -688,8 +718,15 @@ export class GameObject
                     game.player.executeEffects(6,{"val":0,"owner":game.player,"target":this});//normal dmg done
 
 
-                    if (game.playerWeapon.obj !== null && game.playerWeapon.obj.uses <= 0){
-                        game.playerWeapon.obj = null;
+                    if (game.playerWeapon.obj !== null){
+                        let weapon = game.playerWeapon.obj;
+                        weapon.executeEffects(4,{"val":0,"owner":weapon,"target":this});//dmg done
+                        weapon.executeEffects(6,{"val":0,"owner":weapon,"target":this});//normal dmg done
+                        if(weapon.uses <= 0){
+                            weapon.die(null);
+                            game.playerWeapon.obj = null;
+                        }
+
                     }
 
                     //console.log(this.health);
@@ -752,7 +789,10 @@ export class Effect
         switch (id){
             case 1:
                 this.execute = (v) => {
-                    v["val"] = 0;
+                    if(v["owner"].health <= this.value){
+                        v["val"] = 0;
+                    }
+
                 }
                 break
             case 2:
@@ -809,7 +849,9 @@ export class Effect
                 break
             case 10:
                 this.execute = (v) => {
-                    game.playerWeapon._uses = 0;
+                    if(game.playerWeapon.obj != null){
+                        game.playerWeapon.obj.setUses(0);
+                    }
                 }
                 break
             case 11:
@@ -867,23 +909,24 @@ export class Effect
                     let coord = game.getCoordinates(game.getCellByObj(v["owner"]));
                     let x = coord[0];
                     let y = coord[1];
-                    if(x+1 < game.gameGrid.length){
+                    console.log(game.gameGrid[x][y]);
+                    if(x+1 < game.gameGrid.length && game.gameGrid[x+1][y].obj != null){
                         game.gameGrid[x+1][y].obj.takeNormalDamage(v["owner"],this.value);
                     }
-                    if(x-1 > -1) {
+                    if(x-1 > -1 && game.gameGrid[x-1][y].obj != null) {
                         game.gameGrid[x-1][y].obj.takeNormalDamage(v["owner"], this.value);
                     }
-                    if(y+1 < game.gameGrid[x].length){
+                    if(y+1 < game.gameGrid[x].length && game.gameGrid[x][y+1].obj != null){
                         game.gameGrid[x][y+1].obj.takeNormalDamage(v["owner"],this.value);
                     }
-                    if(y-1 > -1) {
+                    if(y-1 > -1 && game.gameGrid[x][y-1].obj != null) {
                         game.gameGrid[x][y-1].obj.takeNormalDamage(v["owner"], this.value);
                     }
                 }
                 break
             case 20:
                 this.execute = (v) => {
-                    v["owner"]._is_corroded = true;
+                    v["target"]._is_corroded = true;
                 }
                 break
             case 21:
@@ -892,6 +935,11 @@ export class Effect
                     if(!v["owner"].haveUses()){
                         v["owner"].die(null);
                     }
+                }
+                break
+            case 22:
+                this.execute = (v) => {
+                    v["target"].takeNormalDamage(v["owner"],this.value);
                 }
                 break
             case 23:
@@ -911,7 +959,7 @@ export class Effect
                 break
             case 26:
                 this.execute = (v) => {
-                    game.coins += this.value;
+                    game.coins += v["owner"].health;
                 }
                 break
             case 27:
@@ -928,12 +976,32 @@ export class Effect
                 break
             case 29:
                 this.execute = (v) => {
-                    v["owner"].rotation = GameObject.DIR_V[Math.random()*100%GameObject.DIR_V.length];
+                    v["owner"].rotation = GameObject.DIR_V[Math.floor((Math.random()*101)%GameObject.DIR_V.length)];
                 }
                 break
             case 30:
                 this.execute = (v) => {
-                    v["target"].takeNormalDamage(v["owner"],this.value);
+                    let coord = game.getCoordinates(game.getCellByObj(v["owner"]));
+                    let x = coord[0];
+                    let y = coord[1];
+                    let grid = game.gameGrid;
+                    let found = false;
+                    if(x+1 < grid.length && grid[x+1][y].obj === v["target"] && v["owner"].rotation === GameObject.DIR_LEFT){
+                        found = true;
+                    }
+                    if(x-1 > -1 && grid[x-1][y].obj === v["target"] && v["owner"].rotation === GameObject.DIR_RIGHT){
+                        found = true;
+                    }
+                    if(y+1 < grid[x].length && grid[x][y+1].obj === v["target"] && v["owner"].rotation === GameObject.DIR_DOWN){
+                        found = true;
+                    }
+                    if(y-1 > -1 && grid[x][y-1].obj === v["target"] && v["owner"].rotation === GameObject.DIR_UP){
+                        found = true;
+                    }
+                    if(found){
+                        v["target"].takeNormalDamage(v["owner"],this.value);
+                    }
+
                 }
                 break
             case 31:
@@ -1125,7 +1193,7 @@ export class GameCell
                 }
             }else{
                 if(this.obj.rotation !== null){
-                    elements[1].innerHTML = "rotation: " + GameObject.DIR_STR[this.obj.rotation];
+                    elements[1].innerHTML = "" + GameObject.DIR_EMOJI[this.obj.rotation];
                 }else{
                     elements[1].innerHTML = "<br>";
                 }

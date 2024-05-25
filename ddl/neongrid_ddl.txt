@@ -124,10 +124,10 @@ INSERT into game_event (description) VALUES
 INSERT into type (description, spawn_rate, color_bg, color_bd, have_max_health) VALUES
 ("hero",0,"#fff9b3","#fff200",1),
 ("enemy",33,"#c3c3c3","#717171",1),
-("item",17,"#aaff92","#40ff00",0),
-("interactable",15,"#dda6ff","#a100ff",0),
-("weapon",25,"#8fa8ff","#0031ff",0),
-("trap",10,"#dca969","#d56900",0);
+("item",10,"#aaff92","#40ff00",0),
+("interactable",16,"#dda6ff","#a100ff",0),
+("weapon",24,"#8fa8ff","#0031ff",0),
+("trap",17,"#dca969","#d56900",0);
 
 INSERT into object (name,health,max_health,img,id_type,spawn_indicator,id_price) VALUES
 ("normie",10,10,"normie.jpeg",1,1,1),
@@ -155,27 +155,27 @@ INSERT into object (name,health,img,id_type,spawn_indicator) VALUES
 ("box",1,"box.jpeg",4,10);
 INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
 ("knife",3,3,"knife.jpeg",5,10),
-("katana",6,2,"katana.jpeg",5,7),
+("katana",7,1,"katana.jpeg",5,7),
 ("taser",2,5,"taser.jpeg",5,4),
 ("gun",5,3,"pistol.jpeg",5,3),
 ("toxic knife",2,1,"toxic_knife.jpeg",5,4),
 ("toxic gun",3,2,"toxic_gun.jpeg",5,1),
-("laser sword",4,3,"laser_sword.jpeg",5,10),
+("laser sword",4,3,"laser_sword.jpeg",5,9),
 ("shotgun",8,2,"shotgun.jpeg",5,4);
 INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
 ("lasers",2,null,"lasers_on.jpeg",6,10),
 ("lasers",2,null,"lasers_off.jpeg",6,10),
-("bomb",3,4,"bomb.jpeg",6,10),
+("bomb",3,4,"bomb.jpeg",6,8),
 ("toxic puddle",2,3,"toxic_puddle.jpeg",6,2),
 ("",0,0,"empty.jpeg",6,0);
 INSERT into object (name,health,max_health,img,id_type,spawn_indicator,id_price) VALUES
 ("absorber",5,5,"absorber.jpeg",1,1,3),
 ("turret",10,10,"turret.jpeg",6,5,null),
-("turret",10,10,"turret.jpeg",6,5,null);
+("turret",10,10,"turret.jpeg",6,10,null);
 
 
 INSERT into effect (name, description, value, cd, id_event) VALUES
-("corrosion resistance","corrosion stops at 3 hp",3,0,7),
+("corrosion resistance","corrosion stops at 3 hp",3,0,19),
 ("pocket knife","gain a 4*1 knife",21,6,null),
 ("beefed out","potions cure 2 hp extra",2,0,10),
 ("upgrade","increase by 1 the power of all adjacent cells",1,7,null),
@@ -184,20 +184,20 @@ INSERT into effect (name, description, value, cd, id_event) VALUES
 ("furious","do not consume the weapon on a kill",1,0,9),
 ("critical hit","the next attack deal 2x damage",2,7,4);
 INSERT into effect (name, description, value, id_event) VALUES
-("shield","ignore the first damage taken",1,5),
+("shield","ignore the first damage taken",1,2),
 ("revenge","destroy the weapon that kill him",0,1),
 ("death puddle","spawn a toxic puddle on death",32,1),
 ("corrosive touch","give corrosion when attacked",1,5),
 ("wealthy","spawn coins when killed",13,1),
 ("spikes","deal 1 damage back when attacked",1,5),
-("damage absorption","take 1 less damage from all sources except corrosion",1,5),
+("damage absorption","take 1 less damage from all sources except corrosion",1,18),
 ("armed","spawn a weapon when killed",5,1),
-("laser trap activation","activate next turn",30,12),
-("laser trap deactivation","deactivate next turn",29,12),
+("laser trap activation","activate next turn",29,12),
+("laser trap deactivation","deactivate next turn",30,12),
 ("detonation","when it dies it explodes dealing as much damage as its health to adjacent cells",4,1),
 ("corrosive","give corrosion to the target",1,4),
 ("temporary","decrease the uses every turn",1,12),
-("*unused*","*unused*",4,12),
+("damaging","deals 2 damage on interact the player",2,14),
 ("toxins immunity","immune to corrosion",0,15),
 ("poisonous","give corrosion",1,14),
 ("healing","heal",0,14),
@@ -207,13 +207,13 @@ INSERT into effect (name, description, value, cd, id_event,is_shown) VALUES
 ("drain","regenerate 1 hp when killing an enemy",1,0,9,1),
 ("have rotation","spawn with random rotation",0,0,2,0),
 ("passive attack","deals 1 damage if facing the player",1,0,16,1),
-("rotate clockwise","rotate clockwise at the end of every turn",1,0,12,1),
-("rotate counter clockwise","rotate counter clockwise at the end of every turn",1,0,12,1);
+("rotate clockwise","rotate clockwise",1,0,12,1),
+("rotate counter clockwise","rotate counter clockwise",1,0,12,1);
 
 INSERT into have_effect (id_object, id_effect) VALUES
 (1,1),(1,2),(2,3),(2,4),(3,5),(3,6),(4,7),(4,8);
 INSERT into have_effect (id_object, id_effect) VALUES
-(6,9),(8,10),(9,11),(9,12),(9,23),(10,13),(11,14),(12,15),(19,11),(20,16),(25,20),(26,20),(29,18),(30,19),(31,21),(31,19),(32,21),(32,24),(13,26),(14,26),(15,25),(16,25),(17,24),(18,24);
+(6,9),(8,10),(9,11),(9,12),(9,23),(10,13),(11,14),(12,15),(19,11),(20,16),(25,20),(26,20),(29,18),(29,22),(30,17),(31,21),(31,19),(32,21),(32,24),(13,26),(14,26),(15,25),(16,25),(17,24),(18,24);
 INSERT into have_effect (id_object, id_effect) VALUES
 (34,27),(34,28),(35,29),(35,30),(35,31),(36,29),(36,30),(36,32);
 
