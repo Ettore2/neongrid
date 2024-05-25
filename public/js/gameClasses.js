@@ -19,6 +19,7 @@ export class GameInstance
         this.EMPTY_OBJ_ID = 33;
         this.EMPTY_OBJ_INSTANCE;
         this.DT_START = null;
+        this.abilityCard;
 
     }
     static getInstance() {
@@ -254,6 +255,8 @@ export class GameObject
      * **/
     constructor(id, id_type, name, health,max_health, img, effects, spawn_indicator, owned, price, uses)
     {
+        let game = GameInstance.getInstance();
+
         if(GameObject.DIR_STR === null)
         {
             GameObject.DIR_STR = Array();
@@ -275,7 +278,11 @@ export class GameObject
         this._id_type = id_type;
         this._name = name;
         this._health = health;
-        this._max_health = max_health;
+        if(this.getType().have_max_health){
+            this._max_health = max_health;
+        }else{
+            this._max_health = -1;
+        }
         this._img = img;
         this._effects = effects;
         this._spawn_indicator = spawn_indicator;
@@ -291,17 +298,13 @@ export class GameObject
         this._interaction_type = GameObject.INTERACTION_DEFAULT;
         this._damage_multiplier = 1;
 
-        if(id_type === 1 || id_type === 2){
-            this._max_health = health;
-        }else{
-            this._max_health = -1;
-        }
 
 
         this.executeEffects(2, {"val":0,"owner":this,"target":null});
     }
     static convertObj(obj)
     {
+
         return new GameObject(obj.id, obj.id_type, obj.name, obj.health, obj.max_health, obj.img, obj.effects, obj.spawn_indicator, obj.owned, obj.price, obj.uses);
     }
     static convertJSON(obj)
@@ -387,6 +390,17 @@ export class GameObject
     set is_corroded(corroded)
     {
         this._is_corroded = corroded;
+    }
+    set interaction_type(id_type)
+    {
+        this._interaction_type = id_type;
+    }
+    set damage_multiplier(val)
+    {
+        this._damage_multiplier = val;
+        if(this._damage_multiplier <= 1){
+            this._damage_multiplier = 1;
+        }
     }
 
 
@@ -482,8 +496,9 @@ export class GameObject
         if(this._alive){
             let game = GameInstance.getInstance();
             this.executeEffects(1,{"val":0,"owner":this,"target":obj});
-            console.log("executeEffects(1)");
             if(obj !== null){
+                console.log("hi")
+                console.log(obj)
                 obj.executeEffects(9,{"val":0,"owner":obj,"target":this});
             }
 
@@ -509,6 +524,7 @@ export class GameObject
      * @param {int} val **/
     setUses(val){
         if(this.haveUses() ){
+            console.log("setUses")
             this._uses = val;
             if(val <= 0){
                 this._uses = 0;
@@ -536,34 +552,51 @@ export class GameObject
     }
     /**
      * @param {GameObject} source
-     * @param {int} dmg **/
+     * @param {int} dmg
+     * @return {int} **/
     takeNormalDamage(source, dmg){
         let v = {"val":dmg,"owner":this,"target":source}
         //console.log(v["val"]);
         this.executeEffects(17,v);//before dmg
         this.executeEffects(18,v);//before normal dmg
-        //console.log(v["val"]);
         if(!this.haveShields()){
+            if(this.health < v["val"]){
+                v["val"] = this.health;
+            }
             this.health -= v["val"];
             if(this.health < 0){
                 this.health = 0;
             }
         }else{
             this.shields--;
+            v["val"] = 0;
         }
         if(v["val"] > 0){
             this.executeEffects(3,v);//dmg taken
             this.executeEffects(5,v);//normal dmg taken
         }
+
+        if(this.health <= 0){
+            this.die(source);
+        }
+
+        return v["val"];
     }
     /**
      * @param {GameObject} source
-     * @param {int} dmg **/
+     * @param {int} dmg
+     * @return {int} **/
     takeSpecialDamage(source, dmg){
-        if(this.health > 1){
+        if(dmg >= this.health){
+            dmg = this._health - 1;
+        }
+        if(dmg > 0){
             let v = {"val":dmg,"owner":this,"target":source}
             this.executeEffects(17,v);//before dmg
             this.executeEffects(19,v);//before special dmg
+            if(this.health < v["val"]){
+                v["val"] = this.health;
+            }
             if(v["val"] > 0){
                 this.health -= v["val"];
                 if(this.health <= 0){
@@ -572,7 +605,9 @@ export class GameObject
                 this.executeEffects(3,v);//dmg taken
 
             }
+            return v["val"];
         }
+        return 0;
 
     }
     /**
@@ -699,29 +734,28 @@ export class GameObject
                 if(GameObject.IS_TARGET.includes(this.id_type))//target
                 {
                     let weapon = game.playerWeapon.obj
+                    let actualDmg = 0;
                     if(weapon != null){
                         let v = {"val":weapon.health,"owner":game.player,"target":this}
                         game.player.executeEffects(20,v);//before dmg done
                         game.player.executeEffects(21,v);//before normal dmg done
                         v["val"] *= game.player._damage_multiplier;
-                        game.player._damage_multiplier = 1;
-                        this.takeNormalDamage(game.player,v["val"]);
-                        weapon.decreaseUses();
+                        actualDmg = this.takeNormalDamage(game.player,v["val"]);
                     }else if(game.player.health > this.health){
-                        game.player.takeNormalDamage(game.player,this.health);
-                        this.health = 0;
+                        game.player.takeNormalDamage(this,this.health);
+                        this.takeNormalDamage(game.player,this.health);
                     }else {
                         this.takeNormalDamage(game.player,game.player.health);
-                        game.player.health = 0;
+                        game.player.takeNormalDamage(this,game.player.health);
                     }
+                    game.player._damage_multiplier = 1;
                     game.player.executeEffects(4,{"val":0,"owner":game.player,"target":this});//dmg done
                     game.player.executeEffects(6,{"val":0,"owner":game.player,"target":this});//normal dmg done
-
-
                     if (game.playerWeapon.obj !== null){
                         let weapon = game.playerWeapon.obj;
-                        weapon.executeEffects(4,{"val":0,"owner":weapon,"target":this});//dmg done
-                        weapon.executeEffects(6,{"val":0,"owner":weapon,"target":this});//normal dmg done
+                        weapon.executeEffects(4,{"val":actualDmg,"owner":weapon,"target":this});//dmg done
+                        weapon.executeEffects(6,{"val":actualDmg,"owner":weapon,"target":this});//normal dmg done
+                        weapon.decreaseUses();
                         if(weapon.uses <= 0){
                             weapon.die(null);
                             game.playerWeapon.obj = null;
@@ -745,8 +779,8 @@ export class GameObject
                 cell2.obj = this;
             }
 
-            if(this.interaction_type !== GameObject.INTERACTION_DEFAULT){
-                this._interaction_type = GameObject.INTERACTION_DEFAULT;
+            if(game.player.interaction_type !== GameObject.INTERACTION_DEFAULT){
+                game.player._interaction_type = GameObject.INTERACTION_DEFAULT;
             }
 
 
@@ -778,9 +812,10 @@ export class Effect
         this._description = description;
         this._value = value;
         this._cd = cd;
-        this._currCd = cd;
         this._is_shown = is_shown;
         this._id_event = id_event;
+
+        this._currCd = 0;
 
         this.execute;
 
@@ -797,7 +832,8 @@ export class Effect
                 break
             case 2:
                 this.execute = (v) => {
-                    v["val"] = game.getNewObject(this.value);
+                    game.playerWeapon.obj = game.getNewObject(this.value);
+                    this.currCd = this.cd;
                 }
                 break
             case 3:
@@ -807,19 +843,27 @@ export class Effect
                 break
             case 4:
                 this.execute = (v) => {
-                    for(let x = 0; x < game.gameGrid.length; x++){
-                        for(let y = 0; y < game.gameGrid[x].length; y++){
-                            if(game.gameGrid[x][y].obj !== v["owner"]){
-                                game.gameGrid[x][y].obj.heal_overflow(1);
+                    let coord = game.getCoordinates(game.getCellByObj(v["owner"]));
+                    let y = coord[1]-this.value;
+                    let x = coord[0]-this.value;
+                    for(let x2 = 0; x2 < this.value*2+1; x2++){
+                        for(let y2 = 0; y2 < this.value*2+1; y2++){
+                            let xTmp = x + x2;
+                            let yTmp = y + y2;
+                            if(xTmp>=0 && xTmp<game.gameGrid.length && yTmp>=0 && yTmp<game.gameGrid.length){
+                                if(game.gameGrid[xTmp][yTmp].obj !== v["owner"]){
+                                    game.gameGrid[xTmp][yTmp].obj.heal_overflow(1);
+                                }
                             }
 
                         }
                     }
+                    this.currCd = this.cd;
                 }
                 break
             case 5:
                 this.execute = (v) => {
-                    if(v["target"].id_type === 6){
+                    if(v["target"] !== null && v["target"].id_type === 6){
                         v["val"] = 0;
                     }
 
@@ -828,18 +872,22 @@ export class Effect
             case 6:
                 this.execute = (v) => {
                     v["owner"].interaction_type = GameObject.INTERACTION_SWAP;
+                    this.currCd = this.cd;
                 }
                 break
             case 7:
                 this.execute = (v) => {
-                    if(game.playerWeapon.obj !== null){
+                    console.log(game.playerWeapon.obj)
+                    if(GameObject.IS_TARGET.includes(v["target"].id_type)){
                         game.playerWeapon.obj._uses += this.value;
+                        console.log("increase")
                     }
                 }
                 break
             case 8:
                 this.execute = (v) => {
                     v["owner"].damage_multiplier = this.value;
+                    this.currCd = this.cd;
                 }
                 break
             case 9:
@@ -909,7 +957,6 @@ export class Effect
                     let coord = game.getCoordinates(game.getCellByObj(v["owner"]));
                     let x = coord[0];
                     let y = coord[1];
-                    console.log(game.gameGrid[x][y]);
                     if(x+1 < game.gameGrid.length && game.gameGrid[x+1][y].obj != null){
                         game.gameGrid[x+1][y].obj.takeNormalDamage(v["owner"],this.value);
                     }
@@ -964,14 +1011,19 @@ export class Effect
                 break
             case 27:
                 this.execute = (v) => {
+                    console.log("ab 27");
                     if(!v["owner"].haveShields()){
                         v["owner"].addShield(this.value);
                     }
+                    this.currCd = this.cd;
                 }
                 break
             case 28:
                 this.execute = (v) => {
-                    v["owner"].heal(this.value);
+                    if(GameObject.IS_TARGET.includes(v["target"].id_type)){
+                        v["owner"].heal(this.value);
+                    }
+
                 }
                 break
             case 29:
@@ -1030,6 +1082,24 @@ export class Effect
 
                 }
                 break
+            case 33:
+                this.execute = (v) => {
+                    v["owner"].setCorrosion(true);
+                }
+                break
+            case 34:
+                this.execute = (v) => {
+                    this.execute = (v) => {
+                        v["owner"].heal(1);
+                    }
+
+                }
+                break
+            case 35:
+                this.execute = (v) => {
+                    game.player.heal(v["val"]);
+                }
+                break
             default:
                 this.execute = (v) => {}
                 break
@@ -1049,39 +1119,43 @@ export class Effect
     get id() {
         return this._id;
     }
-
     get name() {
         return this._name;
     }
-
     get description() {
         return this._description;
     }
-
     get value() {
         return this._value;
     }
-
     get cd() {
         return this._cd;
     }
-
     get is_shown() {
         return this._is_shown;
     }
-
     get currCd() {
         return this._currCd;
     }
-
     get id_event()
     {
         return this._id_event;
+    }
+    set currCd(cd) {
+        this._currCd = cd;
+        if(this._currCd < 0){
+            this._currCd = 0
+        }
     }
 
     //method
     isPassive(){
         return this.cd === 0;
+    }
+    decreaseCd(){
+        if(!this.isPassive() && this.currCd > 0){
+            this.currCd --;
+        }
     }
 }
 export class Type

@@ -116,8 +116,8 @@ INSERT into game_event (description) VALUES
 ("on damage done"),("on normal dmg taken"),
 ("on normal damage done"),("on special dmg taken"),
 ("on special damage done"),("on kill"),("on heal"),
-("*unused*"),("on turn end"),("on turn start"),
-("on interaction"),("on effect applied"),("on turn play"),
+("*unused*"),("on turn end"),("past turn end"),
+("on interaction"),("on effect applied"),("*unused*"),
 ("before dmg taken"),("before normal dmg taken"),("before special dmg taken"),
 ("before dmg done"),("before normal dmg done"),("before special dmg done");
 
@@ -142,7 +142,7 @@ INSERT into object (name,health,max_health,img,id_type,spawn_indicator) VALUES
 ("toxic bot",8,8,"toxic_bot.jpeg",2,3),
 ("mafioso",7,7,"cyber_mafioso.jpeg",2,7),
 ("spiked bot",7,7,"spike_bot.jpeg",2,3),
-("stalker bot",12,12,"stalker_bot.jpeg",2,2);
+("armored bot",12,12,"armored_bot.jpeg",2,2);
 INSERT into object (name,health,img,id_type,spawn_indicator) VALUES
 ("coins",5,"coin.jpeg",3,10),
 ("coins",15,"coin.jpeg",3,5),
@@ -168,19 +168,22 @@ INSERT into object (name,health,uses,img,id_type,spawn_indicator) VALUES
 ("bomb",3,4,"bomb.jpeg",6,8),
 ("toxic puddle",2,3,"toxic_puddle.jpeg",6,2),
 ("",0,0,"empty.jpeg",6,0);
-INSERT into object (name,health,max_health,img,id_type,spawn_indicator,id_price) VALUES
-("absorber",5,5,"absorber.jpeg",1,1,3),
-("turret",10,10,"turret.jpeg",6,5,null),
-("turret",10,10,"turret.jpeg",6,10,null);
+INSERT into object (name,health,max_health,uses,img,id_type,spawn_indicator,id_price) VALUES
+("absorber",6,6,null,"absorber.jpeg",1,1,3),
+("turret",10,10,null,"turret.jpeg",6,5,null),
+("turret",10,10,null,"turret_inv.jpeg",6,5,null),
+("fog stalker",22,22,null,"fog_stalker.jpeg",2,6,null),
+("medic",4,8,null,"medic.jpeg",2,6,null),
+("purple sword",2,null,2,"purple_sword.jpeg",5,3,null);
 
 
 INSERT into effect (name, description, value, cd, id_event) VALUES
 ("corrosion resistance","corrosion stops at 3 hp",3,0,19),
-("pocket knife","gain a 4*1 knife",21,6,null),
+("pocket knife","gain a knife",21,9,null),
 ("beefed out","potions cure 2 hp extra",2,0,10),
 ("upgrade","increase by 1 the power of all adjacent cells",1,7,null),
-("agile","immune to traps damage",0,0,3),
-("swap","change place with an adjacent cell",0,3,null),
+("agile","immune to traps damage",0,0,17),
+("swap","change place with an adjacent cell",0,4,null),
 ("furious","do not consume the weapon on a kill",1,0,9),
 ("critical hit","the next attack deal 2x damage",2,7,4);
 INSERT into effect (name, description, value, id_event) VALUES
@@ -203,19 +206,22 @@ INSERT into effect (name, description, value, id_event) VALUES
 ("healing","heal",0,14),
 ("coins","give coins",0,14);
 INSERT into effect (name, description, value, cd, id_event,is_shown) VALUES
-("shield generator","if you don't have a shield create 1",1,10,null,1),
+("shield generator","if you don't have a shield create 1",1,9,null,1),
 ("drain","regenerate 1 hp when killing an enemy",1,0,9,1),
 ("have rotation","spawn with random rotation",0,0,2,0),
-("passive attack","deals 1 damage if facing the player",1,0,16,1),
+("passive attack","deals 1 damage if facing the player",1,0,13,1),
 ("rotate clockwise","rotate clockwise",1,0,12,1),
-("rotate counter clockwise","rotate counter clockwise",1,0,12,1);
+("rotate counter clockwise","rotate counter clockwise",1,0,12,1),
+("spawn corroded","spawn with corrosion",0,0,2,1),
+("turn heal","heal 1 every turn",1,0,12,1),
+("life steal","heal the player for the damage dealt",1,0,6,1);
 
 INSERT into have_effect (id_object, id_effect) VALUES
 (1,1),(1,2),(2,3),(2,4),(3,5),(3,6),(4,7),(4,8);
 INSERT into have_effect (id_object, id_effect) VALUES
 (6,9),(8,10),(9,11),(9,12),(9,23),(10,13),(11,14),(12,15),(19,11),(20,16),(25,20),(26,20),(29,18),(29,22),(30,17),(31,21),(31,19),(32,21),(32,24),(13,26),(14,26),(15,25),(16,25),(17,24),(18,24);
 INSERT into have_effect (id_object, id_effect) VALUES
-(34,27),(34,28),(35,29),(35,30),(35,31),(36,29),(36,30),(36,32);
+(34,27),(34,28),(35,29),(35,30),(35,31),(36,29),(36,30),(36,32),(37,33),(38,34),(39,35);
 
 INSERT into have_hero (id_user, id_hero) VALUES
 (1,1),(1,2),(1,4),(2,2),(2,3);

@@ -213,4 +213,15 @@ check_login();
     </div>
 </section>
 <script type="module" src="js/game.js"></script>
+    <script type="module">
+        import {GameInstance} from "./js/gameClasses.js";
+        // quit the game
+        document.querySelector('#quit-btn').addEventListener('click', () =>
+        {
+            //suicide the hero
+            const game = GameInstance.getInstance();
+            <?php $_SESSION[SESSION_IS_DEAD] = true; ?>
+            game.player.die(null);
+        });
+    </script>
 </body>

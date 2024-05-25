@@ -120,7 +120,7 @@ function play()
 function buy() {
     //console.log('buy');
 
-    /** TODO: Algorithm of buy heroes.
+    /**  Algorithm of buy heroes.
      1. step: Check if the user has enough credits to buy the hero.
      1a. step: If he does proceed to the next point.
      1b. step: If he does not have enough credits show the user something or blocks the action.

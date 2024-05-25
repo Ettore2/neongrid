@@ -334,18 +334,19 @@ function getLatestVersion(mysqli $connect):array
     return $arr;
 }
 
-function getBestRun(mysqli $connect, string $email, int $id_version): false|array|null
+function getBestRun(mysqli $connect, int $id_user, int $id_version): false|array|null
 {
     $sql = "
     SELECT * 
     FROM run
-    WHERE email = ? 
+    WHERE 
+    id_user = ?
     AND
     id_version = ?
     ORDER BY turns DESC
     LIMIT 1";
     $stmt = $connect->prepare($sql);
-    $stmt->bind_param("si", $email,$id_version);
+    $stmt->bind_param("ii",$id_user,$id_version);
     $stmt->execute();
     $result = $stmt->get_result();
     return mysqli_fetch_assoc($result);
@@ -363,15 +364,13 @@ function updateRun(mysqli $connect, int $id_hero, int $turns, int $coins, int $d
 
 }
 
-function getRuns(mysqli $connect, int $id_user): false|array|null
+function getRuns(mysqli $connect): false|array|null
 {
     $sql = "
             SELECT * 
             FROM run
-            WHERE id_user = ?
             ORDER BY turns DESC";
     $stmt = $connect->prepare($sql);
-    $stmt->bind_param("i",$id_user);
     $stmt->execute();
     $result = $stmt->get_result();
     return mysqli_fetch_assoc($result);
@@ -379,8 +378,8 @@ function getRuns(mysqli $connect, int $id_user): false|array|null
 
 function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $coins, int $duration, int $id_version, $email):void
 {
-    $data = getBestRun($connect, $email, $id_version);
-    if (($data !== FALSE) && $data["turns"] <= $turns)
+    $data = getBestRun($connect, $id_user, $id_version);
+    if ($data !== FALSE && $data !== NULL && $data["turns"] <= $turns)
     {
         // UPDATE THE BEST RUN
         updateRun($connect,$id_hero,$turns,$coins,$duration,$id_version,$data["id"]);
@@ -398,4 +397,15 @@ function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $
         $stmt->bind_param("iiiiii",$id_user,$id_hero,$turns,$coins,$duration,$id_version);
         $stmt->execute();
     }
+}
+
+function getImgFromID(mysqli $connect, int $id): string
+{
+    $sql = "SELECT img FROM object WHERE id = ?";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("i",$id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $result = mysqli_fetch_assoc($result);
+    return (string)$result['img'];
 }

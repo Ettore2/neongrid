@@ -28,6 +28,15 @@ function check_login(): void
     }
 }
 
+function check_death(): void
+{
+    check_login();
+    if (!isset($_SESSION[SESSION_IS_DEAD])){
+        header("Location: ../public/index.php");
+        exit;
+    }
+}
+
 function updateSession($email,$password): void
 {
     session_regenerate_id(true);

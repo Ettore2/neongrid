@@ -1,4 +1,4 @@
-import {GameCell, GameInstance, GameObject} from "./gameClasses.js";
+import {GameCell, GameInstance} from "./gameClasses.js";
 
 const game = GameInstance.getInstance();
 const turnsText = document.querySelector('#turns-text');
@@ -13,8 +13,18 @@ game.setPlayer(parseInt(sessionStorage.getItem("curr_hero_id")))
 game.coins = 0;
 game.gameCards = document.querySelectorAll('.game-card');
 game.playerWeapon = new GameCell(document.querySelector('#weapon-card'),null);
+game.abilityCard = document.querySelector('#active-btn');
+game.abilityCard.addEventListener('click', (e) =>{
+    let ability = game.player.active()
+    if(ability.currCd === 0){
+        ability.execute({"val":0, "owner":game.player,"target":null});
+        graphicUpdate();
+    }
 
-document.querySelector('#hover-card').style.opacity = 0;
+
+});
+
+document.querySelector('#hover-card').style.opacity = '0';
 //initialize game cards
 for (let i = 0; i < game.gameCards.length; i++)
 {
@@ -46,12 +56,7 @@ for (let i = 0; i < game.gameCards.length; i++)
             }
             for(let x = 0; x < game.gameGrid.length; x++){
                 for(let y = 0; y < game.gameGrid[x].length; y++){
-                    game.gameGrid[x][y].obj.executeEffects(13,{"val":0,"owner":game.gameGrid[x][y].obj,"target":game.player});//normal turn start
-                }
-            }
-            for(let x = 0; x < game.gameGrid.length; x++){
-                for(let y = 0; y < game.gameGrid[x].length; y++){
-                    game.gameGrid[x][y].obj.executeEffects(16,{"val":0,"owner":game.gameGrid[x][y].obj,"target":game.player});//normal turn play
+                    game.gameGrid[x][y].obj.executeEffects(13,{"val":0,"owner":game.gameGrid[x][y].obj,"target":game.player});//normal turn end
                 }
             }
 
@@ -72,7 +77,9 @@ for (let i = 0; i < game.gameCards.length; i++)
                 }
             }*/
 
-            graphicUpdate()
+            game.player.active().decreaseCd();
+
+            graphicUpdate();
         }
 
     });
@@ -80,7 +87,7 @@ for (let i = 0; i < game.gameCards.length; i++)
     {
 
         let card = getFather(e.target);
-        let elements = card.children;
+
 
         //find the obj of the calling card
         let objTmp = null;
@@ -101,7 +108,7 @@ for (let i = 0; i < game.gameCards.length; i++)
         cardHover.style.transitionDuration = "0.8s";
         cardHover.style.opacity = 1;
     });
-    game.gameCards[i].addEventListener('mouseleave', (e) =>
+    game.gameCards[i].addEventListener('mouseleave', () =>
     {
         document.querySelector('#hover-card').style.transitionDuration = "0.5s";
         document.querySelector('#hover-card').style.opacity = '0';
@@ -119,20 +126,14 @@ for (let i = 0; i < game.gameCards.length; i++)
 }
 //console.log(gameGrid);
 
+
+
 graphicUpdate();
 
 
 
 
-// quit btn logic
-document.querySelector('#quit-btn').addEventListener('click', () =>
-{
-    //suicide the hero
-    game.player.die(null);
 
-
-
-});
 
 
 
@@ -156,6 +157,7 @@ function graphicUpdate()
         game.playerWeapon.card.style.opacity = '1';
     }
 
+    game.abilityCard.children[2].innerText = game.player.active().currCd;
 
 }
 function createNewObject()

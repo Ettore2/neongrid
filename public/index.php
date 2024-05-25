@@ -41,7 +41,7 @@ require_once ('../includes/session.php');
                                 <div class="d-flex justify-content-center">
                                     <button type="submit" class="btn btn-primary btn-lg background-color-7">Enter!</button>
                                 </div>
-                                <p style="font-weight: bold;"text-color-2 class="text-center mt-5 mb-0">you don't have an account? <a  class="text-color-1" style="text-decoration: none !important;" href="register.php">register there</a></p>
+                                <p style="font-weight: bold;" class="text-center mt-5 mb-0">you don't have an account? <a  class="text-color-1" style="text-decoration: none !important;" href="register.php">register there</a></p>
                             </form>
                         </div>
                     </div>
