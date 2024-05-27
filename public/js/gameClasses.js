@@ -140,8 +140,12 @@ export class GameInstance
      * @return {GameObject} **/
     createNewObject()
     {
-        //get the type
-        let random = Math.floor(Math.random()*100+1);
+        let probability = 0;
+        for (let i = 0; i < this.TYPES.length; i++){
+            probability += this.TYPES[i].spawn_rate;
+        }
+
+        let random = Math.floor(Math.random()*probability+1);
         let sum = 0, type = null;
         //console.log("random: "+random);
         for (let i = 0; i < this.TYPES.length && type === null; i++){
@@ -237,6 +241,7 @@ export class GameObject
 
     static INTERACTION_DEFAULT = 0;
     static INTERACTION_SWAP = 1;
+    static INTERACTION_TOXIC_TOUCH = 2
 
 
     /**
@@ -494,11 +499,10 @@ export class GameObject
      * @param {GameObject} obj **/
     die(obj){
         if(this._alive){
+            this._alive = false;
             let game = GameInstance.getInstance();
             this.executeEffects(1,{"val":0,"owner":this,"target":obj});
             if(obj !== null){
-                console.log("hi")
-                console.log(obj)
                 obj.executeEffects(9,{"val":0,"owner":obj,"target":this});
             }
 
@@ -517,14 +521,12 @@ export class GameObject
             if(game.playerWeapon.obj === this){
                 game.playerWeapon.obj = null;
             }
-            this._alive = false;
         }
     }
     /**
      * @param {int} val **/
     setUses(val){
         if(this.haveUses() ){
-            console.log("setUses")
             this._uses = val;
             if(val <= 0){
                 this._uses = 0;
@@ -730,6 +732,7 @@ export class GameObject
                 if(GameObject.IS_WEAPON.includes(this.id_type))//weapon
                 {
                     game.playerWeapon.obj = this;
+                    game.player.executeEffects(16,{"val":0,"owner":game.player,"target":this});
                 }
                 if(GameObject.IS_TARGET.includes(this.id_type))//target
                 {
@@ -778,6 +781,9 @@ export class GameObject
                 cell1.obj = game.player;
                 cell2.obj = this;
             }
+            if(game.player.interaction_type === GameObject.INTERACTION_TOXIC_TOUCH){
+                this.setCorrosion(true);
+            }
 
             if(game.player.interaction_type !== GameObject.INTERACTION_DEFAULT){
                 game.player._interaction_type = GameObject.INTERACTION_DEFAULT;
@@ -804,8 +810,13 @@ export class Effect
      * @param {number} cd
      * @param {boolean} is_shown
      * @param {int} id_event
+     * @param {string} img
+     * @param {string} color_bg
+     * @param {string} color_bd
+     * @param {string} color_bg_disabled
+     * @param {string} color_bd_disabled
      * **/
-    constructor(id, name, description, value, cd, is_shown, id_event)
+    constructor(id, name, description, value, cd, is_shown, id_event,img,color_bg,color_bd,color_bg_disabled,color_bd_disabled)
     {
         this._id = id;
         this._name = name;
@@ -814,6 +825,11 @@ export class Effect
         this._cd = cd;
         this._is_shown = is_shown;
         this._id_event = id_event;
+        this._img = img;
+        this._color_bg = color_bg;
+        this._color_bd = color_bd;
+        this._color_bg_disabled = color_bg_disabled;
+        this._color_bd_disabled = color_bd_disabled;
 
         this._currCd = 0;
 
@@ -878,7 +894,7 @@ export class Effect
             case 7:
                 this.execute = (v) => {
                     console.log(game.playerWeapon.obj)
-                    if(GameObject.IS_TARGET.includes(v["target"].id_type)){
+                    if(GameObject.IS_TARGET.includes(v["target"].id_type) && game.playerWeapon.obj !== null){
                         game.playerWeapon.obj._uses += this.value;
                         console.log("increase")
                     }
@@ -1100,6 +1116,19 @@ export class Effect
                     game.player.heal(v["val"]);
                 }
                 break
+            case 36:
+                this.execute = (v) => {
+                    v["owner"].interaction_type = GameObject.INTERACTION_TOXIC_TOUCH;
+                    this.currCd = this.cd;
+                }
+                break
+            case 37:
+                this.execute = (v) => {
+                    if(GameObject.IS_WEAPON.includes(v["target"].id_type)){
+                        v["target"].setUses(v["target"].uses + 1);
+                    }
+                }
+                break
             default:
                 this.execute = (v) => {}
                 break
@@ -1109,7 +1138,7 @@ export class Effect
     }
     static convertObj(obj)
     {
-        return new Effect(obj.id, obj.name, obj.description, obj.value, obj.cd,obj.is_shown,obj.id_event);
+        return new Effect(obj.id, obj.name, obj.description, obj.value, obj.cd,obj.is_shown,obj.id_event,obj.img,obj.color_bg,obj.color_bd,obj.color_bg_disabled,obj.color_bd_disabled);
     }
     static convertJSON(obj)
     {
@@ -1141,6 +1170,10 @@ export class Effect
     {
         return this._id_event;
     }
+    get img()
+    {
+        return this._img;
+    }
     set currCd(cd) {
         this._currCd = cd;
         if(this._currCd < 0){
@@ -1148,7 +1181,23 @@ export class Effect
         }
     }
 
-    //method
+    get color_bg() {
+        return this._color_bg;
+    }
+
+    get color_bd() {
+        return this._color_bd;
+    }
+
+    get color_bg_disabled() {
+        return this._color_bg_disabled;
+    }
+
+    get color_bd_disabled() {
+        return this._color_bd_disabled;
+    }
+
+//method
     isPassive(){
         return this.cd === 0;
     }
@@ -1241,7 +1290,6 @@ export class GameCell
         let elements = this._card.children;
         elements[0].innerHTML = this.obj.name + (this.obj.is_corroded ? " #" : "");
         elements[1].src = "assets/images/cards/" + this.obj.img;
-
         elements = elements[2].children;
 
 

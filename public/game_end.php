@@ -23,6 +23,22 @@ check_death();
     $version = getLatestVersion(CONN);
 
 
+    // UPDATE USER COINS
+    CONN->begin_transaction();
+    try
+    {
+        $userCoins = getCoins(CONN, $email)+$coins;
+        updateUserCoins(CONN, $email, $userCoins);
+        CONN->commit();
+    }
+    catch (Exception $e)
+    {
+        // Rollback on failure
+        CONN->rollback();
+        $_SESSION[SESSION_WARNING] = ERROR_COULD_NOT_UPDATE_COINS;
+        consume_error();
+    }
+
     insertRun(CONN, $id_user, $id_hero, $played_turns, $coins, $played_time, $version['id'], $email);
 
     $_SESSION[SESSION_HOME_CURR_HERO] = $id_hero;

@@ -378,24 +378,38 @@ function getRuns(mysqli $connect): false|array|null
 
 function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $coins, int $duration, int $id_version, $email):void
 {
-    $data = getBestRun($connect, $id_user, $id_version);
-    if ($data !== FALSE && $data !== NULL && $data["turns"] <= $turns)
+    CONN->begin_transaction();
+    try
     {
-        // UPDATE THE BEST RUN
-        updateRun($connect,$id_hero,$turns,$coins,$duration,$id_version,$data["id"]);
+        $data = getBestRun($connect, $id_user, $id_version);
+        if ($data !== FALSE && $data !== NULL)
+        {
+            if($data["turns"] <= $turns){
+                // UPDATE THE BEST RUN
+                updateRun($connect,$id_hero,$turns,$coins,$duration,$id_version,$data["id"]);
+            }
+        }
+        else
+        {
+            // INSERT THE BEST RUN
+            $sql = "
+                    INSERT 
+                    INTO run 
+                    (id_user, id_hero, turns, coins, duration, id_version)
+                    VALUES (?,?,?,?,?,?)
+            ";
+            $stmt = $connect->prepare($sql);
+            $stmt->bind_param("iiiiii",$id_user,$id_hero,$turns,$coins,$duration,$id_version);
+            $stmt->execute();
+        }
+        CONN->commit();
     }
-    else
+    catch (Exception $e)
     {
-        // INSERT THE BEST RUN
-        $sql = "
-                INSERT 
-                INTO run 
-                (id_user, id_hero, turns, coins, duration, id_version)
-                VALUES (?,?,?,?,?,?)
-        ";
-        $stmt = $connect->prepare($sql);
-        $stmt->bind_param("iiiiii",$id_user,$id_hero,$turns,$coins,$duration,$id_version);
-        $stmt->execute();
+        // Rollback on failure
+        CONN->rollback();
+        $_SESSION[SESSION_WARNING] = ERROR_COULD_NOT_UPDATE_RUN;
+        consume_error();
     }
 }
 

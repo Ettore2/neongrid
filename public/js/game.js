@@ -157,7 +157,18 @@ function graphicUpdate()
         game.playerWeapon.card.style.opacity = '1';
     }
 
+    game.abilityCard.children[0].innerText = game.player.active().name;
+    game.abilityCard.children[1].src = "assets/images/effects/" + game.player.active().img;
     game.abilityCard.children[2].innerText = game.player.active().currCd;
+
+
+    if(game.player.active().currCd === 0){
+        game.abilityCard.style.backgroundColor = game.player.active().color_bg;
+        game.abilityCard.style.borderColor = game.player.active().color_bd;
+    }else{
+        game.abilityCard.style.backgroundColor = game.player.active().color_bg_disabled;
+        game.abilityCard.style.borderColor = game.player.active().color_bd_disabled;
+    }
 
 }
 function createNewObject()

@@ -76,7 +76,7 @@ check_login();
                 </div>
             <button id="active-btn" class="card">
                 <p id="active-name-text" style="margin: 0 auto" class="card-name">active</p>
-                <img id="active-name-img"  src="assets/images/cards/toxic_knife.jpeg" class="card-img-top" alt="Object image"/>
+                <img id="active-name-img" style="border-radius: 6px;" src="assets/images/cards/toxic_knife.jpeg" class="card-img-top" alt="Object image"/>
                 <p id="weapon-cd-text" style="margin: 0 auto;text-align: center;" class="card-health">7</p>
             </button>
         </div>
