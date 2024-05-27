@@ -5,6 +5,7 @@ export class GameInstance
         this.OBJECTS = Array();//normal
         this.EFFECTS = Array();//key val
         this.TYPES = Array();//normal
+        this.SKINS = Array();// key val
 
 
         this.coins = 0;
@@ -35,9 +36,33 @@ export class GameInstance
         this.initializeObjects();
         this.initializeTypes();
         this.initializeEffects();
+        this.initializeSkins();
     }
 
     //elaborate data from php
+    initializeTypes(obj)
+    {
+        for(let i = 0; i < obj.length; i++)
+        {
+            this.TYPES.push(Type.convertObj(obj[i]));
+        }
+    }
+    initializeSkins(obj)
+    {
+        for(let i = 0; i < obj.length; i++)
+        {
+            let skinTmp = Skin.convertObj(obj[i]);
+            this.SKINS[skinTmp.id] = skinTmp;
+        }
+    }
+    initializeEffects(obj)
+    {
+        for(let i = 0; i < obj.length; i++)
+        {
+            let effect = Effect.convertObj(obj[i])
+            this.EFFECTS[effect.id] = effect;
+        }
+    }
     initializeHeroes(obj)
     {
         //get heroes
@@ -60,21 +85,6 @@ export class GameInstance
                 this.EMPTY_OBJ_INSTANCE = this.OBJECTS[i];
             }
 
-        }
-    }
-    initializeTypes(obj)
-    {
-        for(let i = 0; i < obj.length; i++)
-        {
-            this.TYPES.push(Type.convertObj(obj[i]));
-        }
-    }
-    initializeEffects(obj)
-    {
-        for(let i = 0; i < obj.length; i++)
-        {
-            let effect = Effect.convertObj(obj[i])
-            this.EFFECTS[effect.id] = effect;
         }
     }
 
@@ -219,7 +229,7 @@ export class GameInstance
         let y_tb=document.createElement('INPUT');
         y_tb.type='TEXT';
         y_tb.name='data';
-        y_tb.value=this.playedTurns+';'+this.coins+';'+this.player.id+';'+diff;
+        y_tb.value=this.playedTurns+';'+this.coins+';'+this.player.id+';'+diff+';'+this.player.getSkin().id;
         my_form.appendChild(y_tb);
 
         document.body.appendChild(my_form);
@@ -259,14 +269,13 @@ export class GameObject
      * @param {string} name
      * @param {number} health
      * @param {number} max_health
-     * @param {string} img
+     * @param {[int]} id_skins
      * @param {[int]} effects
      * @param {int} spawn_indicator
-     * @param {boolean} owned
-     * @param {number} price
      * @param {int} uses
+     * @param {int} id_curr_img
      * **/
-    constructor(id, id_type, name, health,max_health, img, effects, spawn_indicator, owned, price, uses)
+    constructor(id, id_type, name, health,max_health, id_skins, effects, spawn_indicator, uses,id_curr_img)
     {
         let game = GameInstance.getInstance();
 
@@ -296,12 +305,22 @@ export class GameObject
         }else{
             this._max_health = -1;
         }
-        this._img = img;
+        this._id_skins = id_skins;
         this._effects = effects;
         this._spawn_indicator = spawn_indicator;
-        this._owned = owned;
-        this._price = price;
         this._uses = uses;
+        this._id_curr_img;
+
+        if(id_curr_img === 0){
+            this._id_curr_img = id_curr_img;
+        }else{
+            this._id_curr_img = -1;
+            for(let i = 0; i < this.id_skins.length && this._id_curr_img === -1; i++){
+                if(this.id_skins[i] === id_curr_img){
+                    this._id_curr_img = i;
+                }
+            }
+        }
 
         //console.log(effects === null);
         this._alive = true;
@@ -317,12 +336,7 @@ export class GameObject
     }
     static convertObj(obj)
     {
-
-        return new GameObject(obj.id, obj.id_type, obj.name, obj.health, obj.max_health, obj.img, obj.effects, obj.spawn_indicator, obj.owned, obj.price, obj.uses);
-    }
-    static convertJSON(obj)
-    {
-        return new GameObject(obj._id, obj._id_type, obj._name, obj._health, obj._max_health, obj._img, obj._effects, obj._spawn_indicator, obj._owned, obj._price, obj._uses);
+        return new GameObject(obj.id, obj.id_type, obj.name, obj.health, obj.max_health, obj.id_skins, obj.effects, obj.spawn_indicator, obj.uses, obj.id_curr_img);
     }
     get id()
     {
@@ -340,6 +354,9 @@ export class GameObject
     {
         return this._health;
     }
+    get id_curr_img() {
+        return this._id_curr_img;
+    }
     get max_health()
     {
         return this._max_health;
@@ -352,9 +369,9 @@ export class GameObject
     {
         this._health = health;
     }
-    get img()
+    get id_skins()
     {
-        return this._img;
+        return this._id_skins;
     }
     get effects()
     {
@@ -367,14 +384,6 @@ export class GameObject
     get damage_multiplier()
     {
         return this._damage_multiplier;
-    }
-    get owned()
-    {
-        return this._owned;
-    }
-    get price()
-    {
-        return this._price;
     }
     get uses()
     {
@@ -408,12 +417,14 @@ export class GameObject
     {
         this._interaction_type = id_type;
     }
-    set damage_multiplier(val)
-    {
+    set damage_multiplier(val) {
         this._damage_multiplier = val;
-        if(this._damage_multiplier <= 1){
+        if (this._damage_multiplier <= 1) {
             this._damage_multiplier = 1;
         }
+    }
+    set id_curr_img(id) {
+        this._id_curr_img = id;
     }
 
 
@@ -490,6 +501,16 @@ export class GameObject
             }
         }
         return result;
+    }
+    /**
+     * @return {string} **/
+    getImgStr(){
+        return this.getSkin().img;
+    }
+    /**
+     * @return {Skin} **/
+    getSkin(){
+        return GameInstance.getInstance().SKINS[this.id_skins[this._id_curr_img]];
     }
     havePassives(){
         let game = GameInstance.getInstance();
@@ -1035,7 +1056,6 @@ export class Effect
                 break
             case 27:
                 this.execute = (v) => {
-                    console.log("ab 27");
                     if(!v["owner"].haveShields()){
                         v["owner"].addShield(this.value);
                     }
@@ -1239,10 +1259,6 @@ export class Type
     {
         return new Type(obj.id, obj.description, obj.spawn_rate, obj.color_bg, obj.color_bd, obj.have_max_health);
     }
-    static convertJSON(obj)
-    {
-        return new Type(obj._id, obj._description, obj._spawn_rate, obj._color_bg, obj._color_bd, obj._have_max_health);
-    }
 
     get id() {
         return this._id;
@@ -1261,6 +1277,40 @@ export class Type
     }
     get have_max_health() {
         return this._have_max_health;
+    }
+}
+export class Skin{
+    /**
+     *@constructor
+     * @param {int} id
+     * @param {string} img
+     * @param {int} price
+     * @param {boolean} owned
+     * **/
+    constructor(id, img, price, owned)
+    {
+        this._id = id;
+        this._img = img;
+        this._price = price;
+        this._owned = owned;
+    }
+    static convertObj(obj)
+    {
+        return new Skin(obj.id, obj.img, obj.price, obj.owned);
+    }
+
+
+    get id() {
+        return this._id;
+    }
+    get img() {
+        return this._img;
+    }
+    get price() {
+        return this._price;
+    }
+    get owned() {
+        return this._owned;
     }
 }
 export class GameCell
@@ -1297,7 +1347,7 @@ export class GameCell
 
         let elements = this._card.children;
         elements[0].innerHTML = this.obj.name + (this.obj.is_corroded ? " #" : "");
-        elements[1].src = "assets/images/cards/" + this.obj.img;
+        elements[1].src = "assets/images/cards/" + this.obj.getImgStr();
         elements = elements[2].children;
 
 
@@ -1376,4 +1426,5 @@ export class GameCell
     click(){
         return this.obj.click();
     }
+
 }

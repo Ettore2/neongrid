@@ -20,9 +20,20 @@ check_login();
     $coins = (int)$data[1];
     $id_hero = (int)$data[2];
     $played_time = (int)$data[3];
+    $id_skin = (int)$data[4];
     $id_user = getUserIdFromEmail(CONN, $email);
     $version = getLatestVersion(CONN);
 
+    $hero = getHeroById(CONN, $id_hero);
+    $index = null;
+
+    for ($i = 0; $i < sizeof($hero['id_skins']) && $index === null; $i++)
+    {
+        if ($hero['id_skins'][$i] === $id_skin)
+        {
+            $index = $i;
+        }
+    }
 
     // UPDATE USER COINS
     CONN->begin_transaction();
@@ -40,7 +51,7 @@ check_login();
         consume_error();
     }
 
-    insertRun(CONN, $id_user, $id_hero, $played_turns, $coins, $played_time, $version['id']);
+    insertRun(CONN, $id_user, $id_skin, $played_turns, $coins, $played_time, $version['id']);
 
     $_SESSION[SESSION_HOME_CURR_HERO] = $id_hero;
 
@@ -86,25 +97,25 @@ check_login();
                         <div class="card text-center">
                             <div class="card-header">You lose</div>
                             <div class="card-body">
-                                <h5 class="card-title">Time: <?=$played_time;?> seconds</h5>
+                                <h5 class="card-title">Turns: <?=$played_turns;?></h5>
                                 <div class="row mt-2">
                                     <div class="col-4">
                                         <p class="card-text">Coins: <?=$coins;?></p>
                                     </div>
                                     <div class="col-4">
-                                        <img class="img-fluid" src="assets/images/cards/<?=getImgFromID(CONN,$id_hero)?>" alt="Hero image">
+                                        <img class="img-fluid" src="assets/images/cards/<?=getImgFromID(CONN,$id_skin)?>" alt="Hero image">
                                     </div>
                                     <div class="col-4">
-                                        <p class="card-text">Turns: <?=$played_turns;?></p>
+                                        <p class="card-text">Time: <?=$played_time;?>s</p>
                                     </div>
                                 </div>
                                 <div class="row mt-3">
                                     <div class="col-6">
-                                        <a href="home.php" class="btn btn-primary" data-mdb-ripple-init>Home</a>
+                                        <a href="home.php" class="btn btn-danger" data-mdb-ripple-init>Home</a>
                                     </div>
                                     <div class="col-6">
                                         <form action="game.php" method="post">
-                                            <button name="hero_id" type="submit" value="<?=$id_hero;?>" class="btn btn-primary" data-mdb-ripple-init>Play again</button>
+                                            <button name="val" type="submit" value="<?php echo $id_hero . ';' . $index?>" class="btn btn-success" data-mdb-ripple-init>Play again</button>
                                         </form>
                                     </div>
                                 </div>

@@ -5,7 +5,6 @@ require_once ('../src/functions.php');
 require_once ('../config/connect.php');
 check_login();
 
-//echo ($_POST["hero_id"]." game.php");
 
 ?>
 
@@ -41,19 +40,22 @@ check_login();
 <body style="background-image: url('assets/images/backgrounds/bggame.jpg'); background-repeat: no-repeat; background-size: cover;">
     <script type="module">
         import {Type,Effect, GameInstance, GameObject} from "./js/gameClasses.js";
-        sessionStorage.setItem('curr_hero_id', <?=$_POST["hero_id"]?>);
+        let v =  "<?=$_POST["val"]?>".split(';');
+        sessionStorage.setItem('curr_hero_id', v[0]);
+        sessionStorage.setItem('curr_skin_id', v[1]);
 
         const game = GameInstance.getInstance();
         game.DT_START = Date.now();
 
         game.coins = 0;
         //console.log("game.EFFECTS");
+        game.initializeSkins(<?php echo (json_encode(getSkins(CONN, $_SESSION[SESSION_EMAIL]))); ?>)
         game.initializeTypes(<?php echo (json_encode(getTypes(CONN))); ?>);
         game.initializeEffects(<?php echo (json_encode(getEffects(CONN))); ?>);
-        game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>);
+        game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN))); ?>);
         game.initializeObjects(<?php echo (json_encode(getObjects(CONN))); ?>);
 
-        //console.log(game.EFFECTS);
+        console.log(game.HEROES);
         //console.log("-----------------------------------");
     </script>
 

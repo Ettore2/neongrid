@@ -1,4 +1,6 @@
 <?php
+const EFFECTS = "effects";
+const ID_SKINS = "id_skins";
 
 function checkCredentials(mysqli $connect, string $email, string $password):bool
 {
@@ -62,9 +64,8 @@ function getUserIdFromEmail(mysqli $connect, string $email):int
 function getObjects(mysqli $connect):array
 {
     //need the cast type (by default they are strings)
-    $effects_field = "effects";
     $objects = array();
-    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,object.uses,object.max_health
+    $sql = "select object.id,object.id_type,object.name,object.health,object.spawn_indicator,object.uses,object.max_health,object.id_original_img as id_curr_img
             FROM object where id_type != 1";
     $stmt = $connect->prepare($sql);
     $stmt->execute();
@@ -77,7 +78,9 @@ function getObjects(mysqli $connect):array
         $row["spawn_indicator"] = (int)$row["spawn_indicator"];
         $row["uses"] = (int)$row["uses"];
         $row["max_health"] = (int)$row["max_health"];
-        $row[$effects_field] = array();
+        $row["id_curr_img"] = (int)$row["id_curr_img"];
+        $row[EFFECTS] = array();
+        $row[ID_SKINS] = array();
         $objects[] = $row;
     }
 
@@ -96,53 +99,14 @@ function getObjects(mysqli $connect):array
         {
             if($objects[$i]["id"] == $row["id_object"])
             {
-                Array_push($objects[$i][$effects_field],$row["id_effect"]);
+                Array_push($objects[$i][EFFECTS],$row["id_effect"]);
                 $found = true;
             }
         }
 
     }
-
-
-
-    return $objects;
-}//do not take heroes
-function getHeroes(mysqli $connect, $email):array
-{
-    //need the cast type (by default they are strings)
-    $effects_field = "effects";
-    $heroes = array();
-    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,value as price, have_hero.id as owned, object.max_health
-            FROM object 
-            join type on object.id_type = type.id
-            join price on price.id = object.id_price
-            left join user on 1 left JOIN have_hero on object.id = have_hero.id_hero and user.id = have_hero.id_user
-            where type.description = 'hero' and user.email = ?";
-    $stmt = $connect->prepare($sql);
-    $stmt->bind_param("s", $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while (($row = $result->fetch_assoc()) != null)
-    {
-        //echo("<p>".$row["id"]."</p>");
-        //echo("<p>".($row["owned"] == null ? "true" : "false")."</p>");
-        //var_dump($row["owned"] == null);
-        $row[$effects_field] = array();
-        $row["id"] = (int)$row["id"];
-        $row["id_type"] = (int)$row["id_type"];
-        $row["health"] = (int)$row["health"];
-        $row["spawn_indicator"] = (int)$row["spawn_indicator"];
-        $row["price"] = (int)$row["price"];
-        $row["owned"] = $row["owned"] !== null;
-        $row["max_health"] = (int)$row["max_health"];
-        $heroes[] = $row;
-
-    }
-
-
-
-    $sql = "select * 
-            FROM have_effect";
+    $sql = "select id,id_object 
+            FROM skin";
     $stmt = $connect->prepare($sql);
     $stmt->execute();
     $result = $stmt->get_result();
@@ -150,18 +114,77 @@ function getHeroes(mysqli $connect, $email):array
     {
         $row["id"] = (int)$row["id"];
         $row["id_object"] = (int)$row["id_object"];
+        $found = false;
+        for ($i = 0; $i < sizeof($objects) && !$found; $i++)
+        {
+            if($objects[$i]["id"] == $row["id_object"])
+            {
+                Array_push($objects[$i][ID_SKINS],$row["id"]);
+                $found = true;
+            }
+        }
+
+    }
+    return $objects;
+}//do not take heroes
+function getHeroes(mysqli $connect):array
+{
+    //need the cast type (by default they are strings)
+    $heroes = array();
+    $sql = "select object.id,object.id_type,object.name,object.health,object.spawn_indicator,object.max_health,object.id_original_img as id_curr_img
+            FROM object 
+            where id_type = 1";
+    $stmt = $connect->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while (($row = $result->fetch_assoc()) != null) {
+        $row["id"] = (int)$row["id"];
+        $row["id_type"] = (int)$row["id_type"];
+        $row["health"] = (int)$row["health"];
+        $row["spawn_indicator"] = (int)$row["spawn_indicator"];
+        $row["max_health"] = (int)$row["max_health"];
+        $row["id_curr_img"] = (int)$row["id_curr_img"];
+        $row[EFFECTS] = array();
+        $row[ID_SKINS] = array();
+        $heroes[] = $row;
+
+    }
+
+
+    $sql = "select * 
+            FROM have_effect";
+    $stmt = $connect->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while (($row = $result->fetch_assoc()) != null) {
+        $row["id"] = (int)$row["id"];
+        $row["id_object"] = (int)$row["id_object"];
         $row["id_effect"] = (int)$row["id_effect"];
         $found = false;
-        for ($i = 0; $i < sizeof($heroes) && !$found; $i++)
-        {
-            if($heroes[$i]["id"] == $row["id_object"])
-            {
-                Array_push($heroes[$i][$effects_field],$row["id_effect"]);
+        for ($i = 0; $i < sizeof($heroes) && !$found; $i++) {
+            if ($heroes[$i]["id"] == $row["id_object"]) {
+                Array_push($heroes[$i][EFFECTS], $row["id_effect"]);
                 $found = true;
             }
         }
     }
 
+    $sql = "select id,id_object 
+            FROM skin";
+    $stmt = $connect->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while (($row = $result->fetch_assoc()) != null) {
+        $row["id"] = (int)$row["id"];
+        $row["id_object"] = (int)$row["id_object"];
+        $found = false;
+        for ($i = 0; $i < sizeof($heroes) && !$found; $i++) {
+            if ($heroes[$i]["id"] == $row["id_object"]) {
+                Array_push($heroes[$i][ID_SKINS], $row["id"]);
+                $found = true;
+            }
+        }
+    }
     return $heroes;
 }
 function getEffects(mysqli $connect): array
@@ -202,6 +225,28 @@ function getTypes(mysqli $connect): array
 
     return $return;
 }
+function getSkins(mysqli $connect, string $email): array
+{
+    //need the cast type (by default they are strings)
+    $return = array();
+    $sql = "select skin.id,price.value as price,img,have_skin.id as owned
+            FROM skin
+            left JOIN price on skin.id_price = price.id
+            LEFT join have_skin on have_skin.id_skin = skin.id and have_skin.id_user = 
+            (SELECT id FROM user WHERE email = ?);";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while (($row = $result->fetch_assoc()) != null){
+        $row["id"] = (int)$row["id"];
+        $row["price"] = (int)$row["price"];
+        $row["owned"] = $row["owned"] != null ? true : false;
+        $return[] = $row;
+    }
+
+    return $return;
+}
 function getCoins(mysqli $connect, string $email): int
 {
     $sql = "SELECT coins FROM user WHERE email = ?";
@@ -228,34 +273,28 @@ function getPrices(mysqli $connect):array
     return $return;
 }
 
-function getHeroById(mysqli $connect, string $email, int $id_hero): array
+function getHeroById(mysqli $connect, int $id_hero): array
 {
     //need the cast type (by default they are strings)
-    $effects_field = "effects";
-    $sql = "select object.id,object.id_type,object.name,object.health,object.img,object.spawn_indicator,value as price, have_hero.id as owned, object.max_health
+    $sql = "select object.id,object.id_type,object.name,object.health,object.spawn_indicator,object.max_health,object.id_original_img as id_curr_img
             FROM object 
-            join type on object.id_type = type.id
-            join price on price.id = object.id_price
-            left join user on 1 left JOIN have_hero on object.id = have_hero.id_hero and user.id = have_hero.id_user
-            where type.description = 'hero' and user.email = ? and object.id = ?";
+            where id_type = 1 and object.id = ?";
     $stmt = $connect->prepare($sql);
-    $stmt->bind_param("si", $email,$id_hero);
+    $stmt->bind_param("i" ,$id_hero);
     $stmt->execute();
     $result = $stmt->get_result();
     $row = $result->fetch_assoc();
 
-    $row[$effects_field] = array();
     $row["id"] = (int)$row["id"];
     $row["id_type"] = (int)$row["id_type"];
     $row["health"] = (int)$row["health"];
     $row["spawn_indicator"] = (int)$row["spawn_indicator"];
-    $row["price"] = (int)$row["price"];
-    $row["owned"] = $row["owned"] !== null;
     $row["max_health"] = (int)$row["max_health"];
+    $row["id_curr_img"] = (int)$row["id_curr_img"];
+    $row[EFFECTS] = array();
+    $row[ID_SKINS] = array();
 
     $hero = $row;
-
-
 
 
     $sql = "select * 
@@ -270,25 +309,50 @@ function getHeroById(mysqli $connect, string $email, int $id_hero): array
         $row["id_effect"] = (int)$row["id_effect"];
         if($hero["id"] == $row["id_object"])
         {
-            Array_push($hero[$effects_field],$row["id_effect"]);
+            Array_push($hero[EFFECTS],$row["id_effect"]);
+        }
+    }
+
+    $sql = "select id,id_object 
+            FROM skin";
+    $stmt = $connect->prepare($sql);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while (($row = $result->fetch_assoc()) != null) {
+        $row["id"] = (int)$row["id"];
+        $row["id_object"] = (int)$row["id_object"];
+        if ($hero["id"] == $row["id_object"]) {
+            Array_push($hero[ID_SKINS], $row["id"]);
         }
     }
 
     return $hero;
 }
+function getSkinPrice(mysqli $connect, int $id_skin): int
+{
+    //need the cast type (by default they are strings)
+    $sql = "select price.value as price from skin JOIN price on skin.id_price = price.id where skin.id = ?";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("i" ,$id_skin);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $result = $result->fetch_assoc();
+    return $result['price'];
 
-function purchaseHero(mysqli $connect, string $email, int $id_hero):bool
+}
+
+function purchaseSkin(mysqli $connect, string $email, int $id_skin):bool
 {
     CONN->begin_transaction();
     try {
-        $coins = getCoins($connect, $email) - getHeroById($connect, $email, $id_hero)["price"];
+        $coins = getCoins($connect, $email) - getSkinPrice($connect, $id_skin);
         if($coins >= 0){
             updateUserCoins($connect, $email, $coins);
 
             $id_user = getUserIdFromEmail($connect,$email);
-            $sql = "INSERT INTO have_hero (id_user, id_hero) values (?,?)";
+            $sql = "INSERT INTO have_skin (id_user, id_skin) values (?,?)";
             $stmt = $connect->prepare($sql);
-            $stmt->bind_param("ii", $id_user, $id_hero);
+            $stmt->bind_param("ii", $id_user, $id_skin);
             $stmt->execute();
 
             // Commit transaction
@@ -353,14 +417,50 @@ function getBestRun(mysqli $connect, int $id_user, int $id_version): false|array
     return mysqli_fetch_assoc($result);
 }
 
-function updateRun(mysqli $connect, int $id_hero, int $turns, int $coins, int $duration, int $id_version, int $idBest): void
+function getPositionRun(mysqli $connect, int $turns): int
+{
+    $sql = "SELECT COUNT(*) AS position FROM run
+            WHERE turns > ?";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param('i',$turns);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return (int)mysqli_fetch_assoc($result)['position'] + 1;
+}
+function getBestRunView(mysqli $connect, int $id_user, int $id_version): false|array|null
+{
+    $sql = "
+            SELECT user.id as id, user.username as username,
+            skin.img as img,
+            object.name as name,
+            run.turns as turns, run.coins as coins,run.duration as duration
+            FROM run
+            JOIN user ON
+            run.id_user = user.id
+            JOIN skin ON
+            run.id_skin = skin.id
+            join object on 
+            skin.id_object = object.id
+            WHERE id_user = ?
+            AND
+            id_version = ?
+            ORDER BY turns DESC
+            LIMIT 30";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("ii",$id_user,$id_version);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    return mysqli_fetch_assoc($result);
+}
+
+function updateRun(mysqli $connect, int $id_skin, int $turns, int $coins, int $duration, int $id_version, int $idBest): void
 {
     $sql = "
             UPDATE run 
-            SET id_hero = ?, turns = ?, coins = ?, duration = ?, id_version = ?
+            SET id_skin = ?, turns = ?, coins = ?, duration = ?, id_version = ?
             WHERE id = ?";
     $stmt = $connect->prepare($sql);
-    $stmt->bind_param('iiiiii',$id_hero,$turns,$coins,$duration,$id_version,$idBest);
+    $stmt->bind_param('iiiiii',$id_skin,$turns,$coins,$duration,$id_version,$idBest);
     $stmt->execute();
 
 }
@@ -369,13 +469,16 @@ function getRuns(mysqli $connect): false|mysqli_result
 {
     $sql = "
             SELECT user.id as id, user.username as username,
-            object.img as img,
-            run.turns as turns, run.coins as coins, run.duration as duration
+            skin.img as img,
+            object.name as name,
+            run.turns as turns, run.coins as coins,run.duration as duration
             FROM run
             JOIN user ON
             run.id_user = user.id
-            JOIN object ON
-            run.id_hero = object.id
+            JOIN skin ON
+            run.id_skin = skin.id
+            join object on 
+            skin.id_object = object.id
             ORDER BY turns DESC
             LIMIT 30";
     $stmt = $connect->prepare($sql);
@@ -383,7 +486,7 @@ function getRuns(mysqli $connect): false|mysqli_result
     return $stmt->get_result();
 }
 
-function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $coins, int $duration, int $id_version):void
+function insertRun(mysqli $connect,int $id_user, int $id_skin, int $turns, int $coins, int $duration, int $id_version):void
 {
     CONN->begin_transaction();
     try
@@ -393,7 +496,7 @@ function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $
         {
             if($data["turns"] <= $turns){
                 // UPDATE THE BEST RUN
-                updateRun($connect,$id_hero,$turns,$coins,$duration,$id_version,$data["id"]);
+                updateRun($connect,$id_skin,$turns,$coins,$duration,$id_version,$data["id"]);
             }
         }
         else
@@ -402,11 +505,11 @@ function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $
             $sql = "
                     INSERT 
                     INTO run 
-                    (id_user, id_hero, turns, coins, duration, id_version)
+                    (id_user, id_skin, turns, coins, duration, id_version)
                     VALUES (?,?,?,?,?,?)
             ";
             $stmt = $connect->prepare($sql);
-            $stmt->bind_param("iiiiii",$id_user,$id_hero,$turns,$coins,$duration,$id_version);
+            $stmt->bind_param("iiiiii",$id_user,$id_skin,$turns,$coins,$duration,$id_version);
             $stmt->execute();
         }
         CONN->commit();
@@ -422,7 +525,7 @@ function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $
 
 function getImgFromID(mysqli $connect, int $id): string
 {
-    $sql = "SELECT img FROM object WHERE id = ?";
+    $sql = "SELECT img FROM skin WHERE id = ?";
     $stmt = $connect->prepare($sql);
     $stmt->bind_param("i",$id);
     $stmt->execute();

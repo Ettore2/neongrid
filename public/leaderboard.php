@@ -34,9 +34,10 @@ check_login();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 
-<body>
+<body style="background-image: url('assets/images/backgrounds/bgLeaderboard.jpg'); background-repeat: no-repeat; background-size: cover;">
 <section class="vh-100 bg-image">
     <!-- Navbar -->
+
     <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary">
         <!-- Container wrapper -->
         <div class="container-fluid">
@@ -69,57 +70,97 @@ check_login();
                 </ul>
             </div>
     </nav>
-<div class="container-fluid">
-    <?php
-        $result = getRuns(CONN);
-        if (mysqli_num_rows($result))
-        {
-            echo '<table class="table table-hover table-striped">';
-            /*
-            <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">First</th>
-                  <th scope="col">Last</th>
-                  <th scope="col">Handle</th>
-                </tr>
-            </thead>
-            */
-            echo '<thead>';
-            echo '<tr>';
-            echo '<th scope="col">Position</th>';
-            echo '<th scope="col">Image</th>';
-            echo '<th scope="col">ID User</th>';
-            echo '<th scope="col">Username</th>';
-            echo '<th scope="col">Turns</th>';
-            echo '<th scope="col">Coins</th>';
-            echo '<th scope="col">Duration</th>';
-            echo '</tr>';
-            echo '</thead>';
-            echo '<tbody>';
-            $position = 1;
-            while ($row = $result->fetch_assoc())
-            {
-                echo '<tr>';
-                echo '<th scope="row">'.$position.'</th>';
-                $img = "assets/images/cards/".$row['img'];
-                ?>
-                <td style="width: 20%; margin-left: auto; margin-right: auto;">
-                    <img style="width: 30%; height: 30%;" src="<?=$img?>" alt="hero img">
-                </td>
+
+    <div style="display: flex;">
+        <div style="width: 50%;">
+            <div class="container-fluid col-9" style="margin-left: 3%; margin-top: 3%;padding: 0;overflow-y:auto; height: 50%;">
                 <?php
-                echo '<td>'.$row['id'].'</td>';
-                echo '<td>'.$row['username'].'</td>';
-                echo '<td>'.$row['turns'].'</td>';
-                echo '<td>'.$row['coins'].'</td>';
-                echo '<td>'.$row['duration'].'s'.'</td>';
-                echo '</tr>';
-                $position++;
-            }
-            echo '</tbody>';
-            echo '</table>';
-        }
-    ?>
-</div>
+                $result = getRuns(CONN);
+                if (mysqli_num_rows($result))
+                {
+                    echo '<table class="table table-hover table-striped">';
+                    echo '<thead style="position: sticky;top: 0;">';
+                    echo '<tr>';
+                    echo '<th scope="col">N°</th>';
+                    echo '<th scope="col">Skin</th>';
+                    echo '<th scope="col">Hero</th>';
+                    echo '<th scope="col">ID User</th>';
+                    echo '<th scope="col">Username</th>';
+                    echo '<th scope="col">Turns</th>';
+                    echo '<th scope="col">Coins</th>';
+                    echo '<th scope="col">Duration</th>';
+                    echo '</tr>';
+                    echo '</thead>';
+                    echo '<tbody>';
+                    $position = 1;
+                    while ($row = $result->fetch_assoc())
+                    {
+                        echo '<tr>';
+                        echo '<th style="width: 8%" scope="row">'.$position.'</th>';
+                        $img = "assets/images/cards/".$row['img'];
+                        ?>
+                        <td style="width: 8%; margin-left: auto; margin-right: auto;">
+                            <img style="width: 100%; height: 100%;" src="<?=$img?>" alt="hero img">
+                        </td>
+                        <?php
+                        echo '<td>'.$row['name'].'</td>';
+                        echo '<td>'.$row['id'].'</td>';
+                        echo '<td>'.$row['username'].'</td>';
+                        echo '<td>'.$row['turns'].'</td>';
+                        echo '<td>'.$row['coins'].'</td>';
+                        echo '<td>'.$row['duration'].'s'.'</td>';
+                        echo '</tr>';
+                        $position++;
+                    }
+                    echo '</tbody>';
+                    echo '</table>';
+                }
+                ?>
+            </div>
+        </div>
+
+        <div style="width: 50%;">
+            <div class="container-fluid col-10" style="margin-left: 3%; margin-top: 3%;padding-top: 5%">
+                <?php
+                $result = getBestRunView(CONN, getUserIdFromEmail(CONN, $_SESSION[SESSION_EMAIL]), getLatestVersion(CONN)['id']);
+                if ($result !== NULL)
+                {
+                    echo '<table class="table table-hover table-striped">';
+                    echo '<thead>';
+                    echo '<tr>';
+                    echo '<th scope="col">N°</th>';
+                    echo '<th scope="col">Skin</th>';
+                    echo '<th scope="col">Hero</th>';
+                    echo '<th scope="col">ID User</th>';
+                    echo '<th scope="col">Username</th>';
+                    echo '<th scope="col">Turns</th>';
+                    echo '<th scope="col">Coins</th>';
+                    echo '<th scope="col">Duration</th>';
+                    echo '</tr>';
+                    echo '</thead>';
+                    echo '<tbody>';
+                    echo '<tr>';
+                    echo '<th style="width: 8%" scope="row">'.getPositionRun(CONN, $result['turns']).'</th>';
+                    $img = "assets/images/cards/".$result['img'];
+                    ?>
+                    <td style="width: 8%; margin-left: auto; margin-right: auto;">
+                        <img style="width: 100%; height: 100%;" src="<?=$img?>" alt="hero img">
+                    </td>
+                    <?php
+                    echo '<td>'.$result['name'].'</td>';
+                    echo '<td>'.$result['id'].'</td>';
+                    echo '<td>'.$result['username'].'</td>';
+                    echo '<td>'.$result['turns'].'</td>';
+                    echo '<td>'.$result['coins'].'</td>';
+                    echo '<td>'.$result['duration'].'s'.'</td>';
+                    echo '</tr>';
+                    echo '</tbody>';
+                    echo '</table>';
+                }
+                ?>
+            </div>
+        </div>
+    </div>
+
 </section>
 </body>

@@ -42,12 +42,14 @@ check_login();
     const game = GameInstance.getInstance();
 
     //get coins
+
     game.coins = <?=getCoins(CONN, $_SESSION[SESSION_EMAIL])?>;
+    game.initializeSkins(<?php echo (json_encode(getSkins(CONN, $_SESSION[SESSION_EMAIL]))); ?>)
     game.initializeTypes(<?php echo (json_encode(getTypes(CONN))); ?>)
     game.initializeEffects(<?php echo (json_encode(getEffects(CONN))); ?>)
-    game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN, $_SESSION[SESSION_EMAIL]))); ?>);
-    //console.log(game.HEROES);
-    //console.log(game.EFFECTS);
+    game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN))); ?>);
+    //console.log(game.SKINS);
+    console.log(game.HEROES);
 
 
     sessionStorage.setItem('curr_hero_id', <?php
@@ -165,7 +167,7 @@ check_login();
 
     <div class="container">
         <form id="form-btn" method="post" action="">
-            <button id="btn-play" type="submit" name="hero_id">
+            <button id="btn-play" type="submit" name="val">
                 <b style="width: 55%;color: white;margin: auto; font-size: 180%">500</b>
                 <img style="width: 40%; height: 40%;padding-left: 2%; margin: auto;" src="assets/images/icons/coin_icon.png" alt="coins">
             </button>

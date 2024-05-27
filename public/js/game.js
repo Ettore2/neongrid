@@ -10,6 +10,7 @@ const hoverGameCell = new GameCell(document.getElementById('hover-card'),null);
 //console.log(game.TYPES)
 //console.log(gameObjects)
 game.setPlayer(parseInt(sessionStorage.getItem("curr_hero_id")))
+game.player.id_curr_img = (parseInt(sessionStorage.getItem("curr_skin_id")))
 game.coins = 0;
 game.gameCards = document.querySelectorAll('.game-card');
 game.playerWeapon = new GameCell(document.querySelector('#weapon-card'),null);

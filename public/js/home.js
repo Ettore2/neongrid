@@ -52,7 +52,7 @@ function updateCards(){
     let img  = btn.children[1];
     if(HEROES[heroIndex].isEnabled()){
         btn.disabled = false;
-        if(HEROES[heroIndex].owned){
+        if(HEROES[heroIndex].getSkin().owned){
             //btn play
             text.innerText = 'Play';
             btn.addEventListener('click', play);
@@ -62,7 +62,7 @@ function updateCards(){
             img.style.display = "none";
         }else{
             //btn buy
-            text.innerText = HEROES[heroIndex].price;
+            text.innerText = HEROES[heroIndex].getSkin().price;
             btn.removeEventListener('click', play);
             btn.addEventListener('click', buy);
             img.style.display = "block";
@@ -95,7 +95,7 @@ function setCardAttribute(card, hero){
     let elements = card.children;
     //console.log(elements);
     elements[0].innerHTML =  hero.name;
-    elements[1].src = "assets/images/cards/" + hero.img;
+    elements[1].src = "assets/images/cards/" + hero.getImgStr();
 
     elements = elements[2].children;
     //console.log(elements);
@@ -113,7 +113,7 @@ function setCardAttribute(card, hero){
 function play()
 {
     //console.log("play");
-    btn.value = HEROES[heroIndex].id;
+    btn.value = HEROES[heroIndex].id+";"+HEROES[heroIndex].id_curr_img;
     document.getElementById("form-btn").action = "game.php";
 }
 
@@ -128,9 +128,9 @@ function buy() {
 
      **/
 
-    if (game.coins < HEROES[heroIndex].price)
+    if (game.coins < HEROES[heroIndex].getSkin().price)
         return;
 
-    btn.value = HEROES[heroIndex].id;
+    btn.value = HEROES[heroIndex].getSkin().id;
     document.getElementById("form-btn").action = "buy_hero.php";
 }
