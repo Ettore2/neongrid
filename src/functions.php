@@ -321,6 +321,7 @@ function updateUserCoins(mysqli $connect, string $email,int $coins):void
     $stmt->execute();
 }
 
+
 function getLatestVersion(mysqli $connect):array
 {
     $sql = "SELECT MAX(id) as id, description FROM version ";
@@ -364,19 +365,25 @@ function updateRun(mysqli $connect, int $id_hero, int $turns, int $coins, int $d
 
 }
 
-function getRuns(mysqli $connect): false|array|null
+function getRuns(mysqli $connect): false|mysqli_result
 {
     $sql = "
-            SELECT * 
+            SELECT user.id as id, user.username as username,
+            object.img as img,
+            run.turns as turns, run.coins as coins, run.duration as duration
             FROM run
-            ORDER BY turns DESC";
+            JOIN user ON
+            run.id_user = user.id
+            JOIN object ON
+            run.id_hero = object.id
+            ORDER BY turns DESC
+            LIMIT 30";
     $stmt = $connect->prepare($sql);
     $stmt->execute();
-    $result = $stmt->get_result();
-    return mysqli_fetch_assoc($result);
+    return $stmt->get_result();
 }
 
-function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $coins, int $duration, int $id_version, $email):void
+function insertRun(mysqli $connect,int $id_user, int $id_hero, int $turns, int $coins, int $duration, int $id_version):void
 {
     CONN->begin_transaction();
     try

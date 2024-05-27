@@ -211,14 +211,22 @@ export class GameInstance
         let diff = Date.now() - this.DT_START;
         diff = Math.floor(diff / 1000);
 
+        let my_form=document.createElement('FORM');
+        my_form.name='myForm';
+        my_form.method='POST';
+        my_form.action='./game_end.php';
+
+        let y_tb=document.createElement('INPUT');
+        y_tb.type='TEXT';
+        y_tb.name='data';
+        y_tb.value=this.playedTurns+';'+this.coins+';'+this.player.id+';'+diff;
+        my_form.appendChild(y_tb);
+
+        document.body.appendChild(my_form);
+
+        my_form.submit();
 
 
-
-        window.location.href = './game_end.php'+
-                                '?played_turns='+this.playedTurns+
-                                '&coins='+this.coins+
-                                '&id_hero='+this.player.id+
-                                '&played_time='+diff;
     }
 
 }
@@ -1142,7 +1150,7 @@ export class Effect
     }
     static convertJSON(obj)
     {
-        return new Effect(obj._id, obj._name, obj._description, obj._value, obj._cd, obj._is_shown, obj._id_event);
+        return new Effect(obj._id, obj._name, obj._description, obj._value, obj._cd, obj._is_shown, obj._id_event, obj._img);
     }
 
     get id() {

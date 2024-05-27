@@ -4,22 +4,23 @@ require_once ('../includes/session.php');
 require_once ('../src/functions.php');
 require_once ('../config/connect.php');
 
-check_death();
+check_login();
 ?>
 
 
 <?php
 
     /** GET THE DATA **/
-    if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         header('Location: home.php');
     }
-    $email =  $_SESSION[SESSION_EMAIL];
+    $data = explode(";",$_POST['data']);
+    $email = $_SESSION[SESSION_EMAIL];
+    $played_turns = (int)$data[0];
+    $coins = (int)$data[1];
+    $id_hero = (int)$data[2];
+    $played_time = (int)$data[3];
     $id_user = getUserIdFromEmail(CONN, $email);
-    $id_hero = (int)$_GET['id_hero'];
-    $played_turns = (int)$_GET['played_turns'];
-    $coins = (int)$_GET['coins'];
-    $played_time = (int)$_GET['played_time'];
     $version = getLatestVersion(CONN);
 
 
@@ -39,11 +40,11 @@ check_death();
         consume_error();
     }
 
-    insertRun(CONN, $id_user, $id_hero, $played_turns, $coins, $played_time, $version['id'], $email);
+    insertRun(CONN, $id_user, $id_hero, $played_turns, $coins, $played_time, $version['id']);
 
     $_SESSION[SESSION_HOME_CURR_HERO] = $id_hero;
 
-    $_SESSION[SESSION_IS_DEAD] = null;
+    //$_SESSION[SESSION_IS_DEAD] = null;
 
 ?>
 

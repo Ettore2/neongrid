@@ -132,7 +132,12 @@ graphicUpdate();
 
 
 
-
+document.querySelector('#quit-btn').addEventListener('click', () =>
+{
+    //suicide the hero
+    const game = GameInstance.getInstance();
+    game.player.die(null);
+});
 
 
 

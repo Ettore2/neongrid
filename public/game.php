@@ -220,7 +220,6 @@ check_login();
         {
             //suicide the hero
             const game = GameInstance.getInstance();
-            <?php $_SESSION[SESSION_IS_DEAD] = true; ?>
             game.player.die(null);
         });
     </script>
