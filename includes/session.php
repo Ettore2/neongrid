@@ -14,7 +14,6 @@ function consume_error(): void{
     }
     $_SESSION[SESSION_WARNING] = null;
 }
-
 function check_login(): void
 {
     if(!isset($_SESSION[SESSION_EMAIL]) || !isset($_SESSION[SESSION_PASSWORD])){
@@ -23,15 +22,6 @@ function check_login(): void
     }
 
     if (!checkCredentials(CONN,$_SESSION[SESSION_EMAIL],$_SESSION[SESSION_PASSWORD])) {
-        header("Location: ../public/index.php");
-        exit;
-    }
-}
-
-function check_death(): void
-{
-    check_login();
-    if (!isset($_SESSION[SESSION_IS_DEAD])){
         header("Location: ../public/index.php");
         exit;
     }
