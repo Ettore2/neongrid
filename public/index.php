@@ -4,6 +4,30 @@ require_once ('../src/functions.php');
 require_once ('../includes/const.php');
 require_once ('../includes/session.php');
 ?>
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST')
+{
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    if ($email === null || $email === '' || $password === null || $password === '')
+    {
+        $_SESSION[SESSION_WARNING] = ERROR_INVALID_DATA;
+        consume_error();
+    }
+
+
+    if (checkCredentials(CONN, $email,$password)){
+        updateSession($email, $password);
+        header("Location: home.php");
+    }else{
+        $_SESSION[SESSION_WARNING] = ERROR_LOGIN_FAILED;
+        consume_error();
+    }
+
+
+    CONN->close();
+}
+?>
 <!doctype html>
 <html lang="en">
 <head>
@@ -53,27 +77,3 @@ require_once ('../includes/session.php');
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>
 </section>
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST')
-{
-    $email = $_POST['email'];
-    $password = $_POST['password'];
-    if ($email === null || $email === '' || $password === null || $password === '')
-    {
-        $_SESSION[SESSION_WARNING] = ERROR_INVALID_DATA;
-        consume_error();
-    }
-
-
-    if (checkCredentials(CONN, $email,$password)){
-        updateSession($email, $password);
-        header("Location: home.php");
-    }else{
-        $_SESSION[SESSION_WARNING] = ERROR_LOGIN_FAILED;
-        consume_error();
-    }
-
-
-    CONN->close();
-}
-?>

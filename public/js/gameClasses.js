@@ -1022,7 +1022,7 @@ export class Effect
                 break
             case 20:
                 this.execute = (v) => {
-                    v["target"]._is_corroded = true;
+                    v["target"].setCorrosion(true);
                 }
                 break
             case 21:
