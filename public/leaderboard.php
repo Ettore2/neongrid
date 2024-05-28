@@ -38,7 +38,7 @@ $id_user = getUserIdFromEmail(CONN, $_SESSION[SESSION_EMAIL]);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 </head>
 
-<body style="background-image: url('assets/images/backgrounds/bgLeaderboard.jpg'); background-repeat: no-repeat; background-size: cover;">
+<body style="background-image: url('assets/images/backgrounds/bgLeaderboard.jpg'); background-repeat: no-repeat; background-size: cover; overflow: hidden;">
 <section class="vh-100 bg-image">
     <!-- Navbar -->
 
@@ -77,7 +77,7 @@ $id_user = getUserIdFromEmail(CONN, $_SESSION[SESSION_EMAIL]);
 
     <div style="display: flex;">
         <div style="width: 50%;">
-            <div class="container-fluid col-9" style="margin-left: 3%; margin-top: 3%;padding: 0;overflow-y:auto; height: 50%;">
+            <div class="container-fluid col-9" style="margin-left: 3%; margin-top: 3%;padding: 0;overflow-y:auto; height: 35%;">
                 <?php
                 $result = getRuns(CONN);
                 if (mysqli_num_rows($result))
@@ -101,10 +101,10 @@ $id_user = getUserIdFromEmail(CONN, $_SESSION[SESSION_EMAIL]);
                     {
                         if ($row['id'] === $id_user)
                         {
-                            echo '<th class="user-row" style="width: 8%;" scope="row">' .$position.'</th>';
+                            echo '<th class="user-row" style="width: 4%;" scope="row">' .$position.'</th>';
                             $img = "assets/images/cards/".$row['img'];
                             ?>
-                            <td class="user-row" style="width: 8%; margin-left: auto; margin-right: auto;">
+                            <td class="user-row" style="width: 11%; margin-left: auto; margin-right: auto;">
                                 <img style="width: 100%; height: 100%;" src="<?=$img?>" alt="hero img">
                             </td>
                             <?php
@@ -118,10 +118,10 @@ $id_user = getUserIdFromEmail(CONN, $_SESSION[SESSION_EMAIL]);
                         }
                         else
                         {
-                            echo '<th class="non-user-row" style="width: 8%" scope="row">'.$position.'</th>';
+                            echo '<th class="non-user-row" style="width: 4%" scope="row">'.$position.'</th>';
                             $img = "assets/images/cards/".$row['img'];
                             ?>
-                            <td class="non-user-row" style="width: 8%; margin-left: auto; margin-right: auto;">
+                            <td class="non-user-row" style="width: 11%; margin-left: auto; margin-right: auto;">
                                 <img style="width: 100%; height: 100%;" src="<?=$img?>" alt="hero img">
                             </td>
                             <?php
@@ -165,10 +165,10 @@ $id_user = getUserIdFromEmail(CONN, $_SESSION[SESSION_EMAIL]);
                     echo '</thead>';
                     echo '<tbody>';
                     echo '<tr>';
-                    echo '<th style="width: 8%" scope="row">'.getPositionRun(CONN, $result['turns']).'</th>';
+                    echo '<th style="width: 4%" scope="row">'.getPositionRun(CONN, $result['turns']).'</th>';
                     $img = "assets/images/cards/".$result['img'];
                     ?>
-                    <td style="width: 8%; margin-left: auto; margin-right: auto;">
+                    <td style="width: 11%; margin-left: auto; margin-right: auto;">
                         <img style="width: 100%; height: 100%;" src="<?=$img?>" alt="hero img">
                     </td>
                     <?php

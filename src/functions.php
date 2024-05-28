@@ -44,7 +44,7 @@ function getHashedPasswordFromEmail(mysqli $connect, string $email):string
 
 function insertUser(mysqli $connect,string $username,string $password,string $email): void
 {
-    $stmt = $connect->prepare("INSERT INTO user (username,password, email) values(?,?,?)");
+    $stmt = $connect->prepare("INSERT INTO user (username,password,email) values(?,?,?)");
     $stmt->bind_param("sss",$username,$password,$email);
     $stmt->execute();
     $stmt->close();

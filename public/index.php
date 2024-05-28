@@ -21,7 +21,7 @@ require_once ('../includes/session.php');
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Jacquard+12&family=Jersey+10&display=swap" rel="stylesheet">
 </head>
-<body style="background-image: url('assets/images/backgrounds/bglogin.jpg'); background-repeat: no-repeat; background-size: cover;">
+<body style="background-image: url('assets/images/backgrounds/bglogin.jpg'); background-repeat: no-repeat; background-size: cover; overflow: hidden;">
 <section class="vh-100 bg-image">
     <div class="mask d-flex align-items-center h-100 gradient-custom-3">
         <div class="container h-100">
@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
     if ($email === null || $email === '' || $password === null || $password === '')
     {
         $_SESSION[SESSION_WARNING] = ERROR_INVALID_DATA;
+        consume_error();
     }
 
 
@@ -69,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         header("Location: home.php");
     }else{
         $_SESSION[SESSION_WARNING] = ERROR_LOGIN_FAILED;
-
+        consume_error();
     }
 
 

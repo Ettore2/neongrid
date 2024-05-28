@@ -90,7 +90,7 @@ $_SESSION[SESSION_HOME_HERO_SKIN] = $index;
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 
 </head>
-<body style="background-image: url('assets/images/backgrounds/bgDeath.jpg'); background-repeat: no-repeat; background-size: cover;">
+<body style="background-image: url('assets/images/backgrounds/bgDeath.jpg'); background-repeat: no-repeat; background-size: cover; overflow: hidden;">
     <section class="vh-100 bg-image">
         <div class="mask d-flex align-items-center h-100">
             <div class="container h-100">

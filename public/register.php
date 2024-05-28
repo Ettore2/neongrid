@@ -21,7 +21,7 @@ require_once ('../includes/session.php');
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Jacquard+12&family=Jersey+10&display=swap" rel="stylesheet">
     </head>
-<body style="background-image: url('assets/images/backgrounds/bgRegister.jpg'); background-repeat: no-repeat; background-size: cover;">
+<body style="background-image: url('assets/images/backgrounds/bgRegister.jpg'); background-repeat: no-repeat; background-size: cover; overflow: hidden;">
 <section class="vh-100 bg-image">
     <div class="mask d-flex align-items-center h-100 gradient-custom-3">
         <div class="container h-100">
@@ -66,24 +66,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
     if ($username === null || $username === '' || $email === null || $email === '' || $password === null || $password === '')
     {
         $_SESSION[SESSION_WARNING] = ERROR_INVALID_DATA;
+        consume_error();
     }
 
     CONN->begin_transaction();
     try {
-
         if (!checkIfUserExists(CONN, $email)){
             insertUser(CONN,$username,password_hash($password, PASSWORD_DEFAULT), $email);
             updateSession($email, $password);
+            // Commit transaction
+            CONN->commit();
             header('location:home.php');
             exit();
         }else{
             $_SESSION[SESSION_WARNING] = ERROR_EMAIL_ALREADY_USED;
             consume_error();
+            // Commit transaction
+            CONN->commit();
         }
 
-        // Commit transaction
-        CONN->commit();
-        //echo "Transaction successfully completed.";
     } catch (Exception $e) {
         // Rollback on failure
         CONN->rollback();
