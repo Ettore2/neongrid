@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Creato il: Mag 27, 2024 alle 22:28
+-- Creato il: Mag 28, 2024 alle 21:25
 -- Versione del server: 10.4.28-MariaDB
 -- Versione PHP: 8.2.4
 
@@ -28,18 +28,18 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `effect` (
-  `id` int(10) NOT NULL,
-  `name` varchar(30) NOT NULL,
-  `description` varchar(100) NOT NULL,
-  `value` int(10) DEFAULT 0,
-  `is_shown` int(1) DEFAULT 1,
-  `cd` int(10) DEFAULT 0,
-  `img` varchar(100) DEFAULT NULL,
-  `id_event` int(10) DEFAULT NULL,
-  `color_bg` varchar(7) DEFAULT NULL,
-  `color_bd` varchar(7) DEFAULT NULL,
-  `color_bg_disabled` varchar(7) DEFAULT NULL,
-  `color_bd_disabled` varchar(7) DEFAULT NULL
+                          `id` int(10) NOT NULL,
+                          `name` varchar(30) NOT NULL,
+                          `description` varchar(100) NOT NULL,
+                          `value` int(10) DEFAULT 0,
+                          `is_shown` int(1) DEFAULT 1,
+                          `cd` int(10) DEFAULT 0,
+                          `img` varchar(100) DEFAULT NULL,
+                          `id_event` int(10) DEFAULT NULL,
+                          `color_bg` varchar(7) DEFAULT NULL,
+                          `color_bd` varchar(7) DEFAULT NULL,
+                          `color_bg_disabled` varchar(7) DEFAULT NULL,
+                          `color_bd_disabled` varchar(7) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -47,33 +47,33 @@ CREATE TABLE `effect` (
 --
 
 INSERT INTO `effect` (`id`, `name`, `description`, `value`, `is_shown`, `cd`, `img`, `id_event`, `color_bg`, `color_bd`, `color_bg_disabled`, `color_bd_disabled`) VALUES
-(1, 'corrosion resistance', 'corrosion stops at 3 hp', 3, 1, 0, NULL, 19, NULL, NULL, NULL, NULL),
-(2, 'pocket knife', 'gain a knife', 21, 1, 9, 'pocket_knife.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#ADADAD'),
-(3, 'beefed out', 'potions cure 2 hp extra', 2, 1, 0, NULL, 10, NULL, NULL, NULL, NULL),
-(4, 'upgrade', 'increase by 1 the power of all adjacent cells', 1, 1, 7, 'upgrade.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#ADADAD'),
-(5, 'agile', 'immune to traps damage', 0, 1, 0, NULL, 17, NULL, NULL, NULL, NULL),
-(6, 'swap', 'change place with an adjacent cell', 0, 1, 4, 'swap.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#bbbbbb'),
-(7, 'furious', 'do not consume the weapon on a kill', 1, 1, 0, NULL, 9, NULL, NULL, NULL, NULL),
-(8, 'critical hit', 'the next attack deal 2x damage', 2, 1, 10, 'critical_hit.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#ADADAD'),
-(9, 'shield', 'ignore the first damage taken', 1, 1, 0, NULL, 2, NULL, NULL, NULL, NULL),
-(10, 'revenge', 'destroy the weapon that kill him', 0, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
-(11, 'death puddle', 'spawn a toxic puddle on death', 32, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
-(12, 'corrosive touch', 'give corrosion when attacked', 1, 1, 0, NULL, 5, NULL, NULL, NULL, NULL),
-(13, 'wealthy', 'spawn coins when killed', 13, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
-(14, 'spikes', 'deal 1 damage back when attacked', 1, 1, 0, NULL, 5, NULL, NULL, NULL, NULL),
-(15, 'damage absorption', 'take 1 less damage from all sources except corrosion', 1, 1, 0, NULL, 18, NULL, NULL, NULL, NULL),
-(16, 'armed', 'spawn a weapon when killed', 5, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
-(17, 'laser trap activation', 'activate next turn', 29, 1, 0, NULL, 12, NULL, NULL, NULL, NULL),
-(18, 'laser trap deactivation', 'deactivate next turn', 30, 1, 0, NULL, 12, NULL, NULL, NULL, NULL),
-(19, 'detonation', 'when it dies it explodes dealing as much damage as its health to adjacent cells', 4, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
-(20, 'corrosive', 'give corrosion to the target', 1, 1, 0, NULL, 4, NULL, NULL, NULL, NULL),
-(21, 'temporary', 'decrease the uses every turn', 1, 1, 0, NULL, 12, NULL, NULL, NULL, NULL),
-(22, 'damaging', 'deals 2 damage on interact the player', 2, 1, 0, NULL, 14, NULL, NULL, NULL, NULL),
-(23, 'toxins immunity', 'immune to corrosion', 0, 1, 0, NULL, 15, NULL, NULL, NULL, NULL),
-(24, 'poisonous', 'give corrosion', 1, 1, 0, NULL, 14, NULL, NULL, NULL, NULL),
-(25, 'healing', 'heal', 0, 1, 0, NULL, 14, NULL, NULL, NULL, NULL),
-(26, 'coins', 'give coins', 0, 1, 0, NULL, 14, NULL, NULL, NULL, NULL),
-(27, 'shield generator', 'if you don\'t have a shield create 1', 1, 1, 16, 'shield_generator.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#ADADAD'),
+                                                                                                                                                                       (1, 'corrosion resistance', 'corrosion stops at 3 hp', 3, 1, 0, NULL, 19, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (2, 'pocket knife', 'gain a knife', 21, 1, 9, 'pocket_knife.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#ADADAD'),
+                                                                                                                                                                       (3, 'beefed out', 'potions cure 2 hp extra', 2, 1, 0, NULL, 10, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (4, 'upgrade', 'increase by 1 the power of all adjacent cells', 1, 1, 7, 'upgrade.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#ADADAD'),
+                                                                                                                                                                       (5, 'agile', 'immune to traps damage', 0, 1, 0, NULL, 17, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (6, 'swap', 'change place with an adjacent cell', 0, 1, 4, 'swap.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#bbbbbb'),
+                                                                                                                                                                       (7, 'furious', 'do not consume the weapon on a kill', 1, 1, 0, NULL, 9, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (8, 'critical hit', 'the next attack deal 2x damage', 2, 1, 10, 'critical_hit.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#ADADAD'),
+                                                                                                                                                                       (9, 'shield', 'ignore the first damage taken', 1, 1, 0, NULL, 2, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (10, 'revenge', 'destroy the weapon that kill him', 0, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (11, 'death puddle', 'spawn a toxic puddle on death', 32, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (12, 'corrosive touch', 'give corrosion when attacked', 1, 1, 0, NULL, 5, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (13, 'wealthy', 'spawn coins when killed', 13, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (14, 'spikes', 'deal 1 damage back when attacked', 1, 1, 0, NULL, 5, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (15, 'damage absorption', 'take 1 less damage from all sources except corrosion', 1, 1, 0, NULL, 18, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (16, 'armed', 'spawn a weapon when killed', 5, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (17, 'laser trap activation', 'activate next turn', 29, 1, 0, NULL, 12, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (18, 'laser trap deactivation', 'deactivate next turn', 30, 1, 0, NULL, 12, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (19, 'detonation', 'when it dies it explodes dealing as much damage as its health to adjacent cells', 4, 1, 0, NULL, 1, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (20, 'corrosive', 'give corrosion to the target', 1, 1, 0, NULL, 4, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (21, 'temporary', 'decrease the uses every turn', 1, 1, 0, NULL, 12, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (22, 'damaging', 'deals 2 damage on interact the player', 2, 1, 0, NULL, 14, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (23, 'toxins immunity', 'immune to corrosion', 0, 1, 0, NULL, 15, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (24, 'poisonous', 'give corrosion', 1, 1, 0, NULL, 14, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (25, 'healing', 'heal', 0, 1, 0, NULL, 14, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (26, 'coins', 'give coins', 0, 1, 0, NULL, 14, NULL, NULL, NULL, NULL),
+                                                                                                                                                                       (27, 'shield generator', 'if you don\'t have a shield create 1', 1, 1, 16, 'shield_generator.jpeg', NULL, '#ffff30', '#fff200', '#bbbbbb', '#ADADAD'),
 (28, 'drain', 'regenerate 1 hp when killing an enemy', 1, 1, 0, NULL, 9, NULL, NULL, NULL, NULL),
 (29, 'have rotation', 'spawn with random rotation', 0, 0, 0, NULL, 2, NULL, NULL, NULL, NULL),
 (30, 'passive attack', 'deals 1 damage if facing the player', 1, 1, 0, NULL, 13, NULL, NULL, NULL, NULL),
@@ -205,12 +205,17 @@ CREATE TABLE `have_skin` (
 --
 
 INSERT INTO `have_skin` (`id`, `id_user`, `id_skin`) VALUES
-(8, 1, 3),
-(9, 1, 4),
-(10, 1, 34),
-(11, 1, 1),
-(12, 1, 2),
-(13, 1, 40);
+(71, 1, 1),
+(72, 1, 69),
+(73, 1, 3),
+(74, 1, 73),
+(75, 1, 72),
+(76, 1, 4),
+(77, 1, 34),
+(78, 1, 65),
+(79, 1, 76),
+(80, 1, 77),
+(81, 12, 3);
 
 -- --------------------------------------------------------
 
@@ -320,7 +325,7 @@ CREATE TABLE `run` (
 --
 
 INSERT INTO `run` (`id`, `id_user`, `id_skin`, `turns`, `coins`, `dt_submit`, `duration`, `id_version`) VALUES
-(2, 1, 2, 40, 11, '2024-05-27 19:59:09', 35, 1),
+(2, 1, 77, 66, 10, '2024-05-27 19:59:09', 62, 1),
 (3, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
 (4, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
 (5, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
@@ -337,14 +342,14 @@ INSERT INTO `run` (`id`, `id_user`, `id_skin`, `turns`, `coins`, `dt_submit`, `d
 (16, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
 (17, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
 (18, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
-(19, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
+(19, 2, 1, 10, 1, '2024-05-27 20:05:08', 1, 1),
 (20, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
 (21, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
 (22, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
 (23, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
 (24, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
 (25, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
-(26, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1),
+(26, 2, 1, 0, 1, '2024-05-27 20:05:08', 1, 1),
 (27, 1, 1, 1, 1, '2024-05-27 20:05:08', 1, 1);
 
 -- --------------------------------------------------------
@@ -412,13 +417,13 @@ INSERT INTO `skin` (`id`, `id_price`, `id_object`, `img`) VALUES
 (68, 6, 40, 'agent_3.jpeg'),
 (69, 5, 1, 'normie_1.jpeg'),
 (70, 6, 1, 'normie_2.jpeg'),
-(71, 6, 1, 'absorber_3.jpeg'),
+(71, 6, 1, 'normie_3.jpeg'),
 (72, 6, 3, 'speedy_1.jpeg'),
 (73, 5, 3, 'speedy_2.jpeg'),
 (74, 6, 2, 'tank_1.jpeg'),
 (75, 5, 2, 'tank_2.jpeg'),
-(76, 6, 4, 'agent_3.jpeg'),
-(77, 6, 4, 'agent_1.jpeg');
+(76, 6, 4, 'warrior_1.jpeg'),
+(77, 6, 4, 'warrior_2.jpeg');
 
 -- --------------------------------------------------------
 
@@ -466,8 +471,10 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `username`, `email`, `password`, `coins`) VALUES
-(1, 'marco', 'marco@gmail.com', '$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K', 9998330),
-(2, 'mario', 'mario@gmail.com', '$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K', 500);
+(1, 'marco', 'marco@gmail.com', '$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K', 9976761),
+(2, 'mario', 'mario@gmail.com', '$2y$10$RKy3Y.zW.H9ZSk2p3lVlke96cJHE4BSMQhBEa4JfutveMYvMlNp7K', 500),
+(11, 'pino', 'pippo@gmail.com', '$2y$10$gSJZluAQ3pu.OS2Tiq6z8e.zFplg4dG2YndagNEWqVqLydpyCPH02', 500),
+(12, 'mino', 'mino@gmail.com', '$2y$10$THIzfthQ35wMv1eDmNoqO.6cJ6kTpoYB1cOAG3CoWqGIfnorBshxa', 0);
 
 -- --------------------------------------------------------
 
@@ -598,7 +605,7 @@ ALTER TABLE `have_effect`
 -- AUTO_INCREMENT per la tabella `have_skin`
 --
 ALTER TABLE `have_skin`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 
 --
 -- AUTO_INCREMENT per la tabella `object`
@@ -634,7 +641,7 @@ ALTER TABLE `type`
 -- AUTO_INCREMENT per la tabella `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT per la tabella `version`
