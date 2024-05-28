@@ -6,17 +6,27 @@ const card1 = document.getElementById('hero-card-1');
 const card2 = document.getElementById('hero-card-2');
 const card3 = document.getElementById('hero-card-3');
 const btn = document.getElementById('btn-play');
-let heroIndex = parseInt(sessionStorage.getItem('curr_hero_id'));
-//console.log(parseInt(sessionStorage.getItem('curr_hero_id')));
-{
-    let found = false;
-    for(let i = 0; i < HEROES.length && !found; i++){
-        if(HEROES[i].id === heroIndex){
-            found = true;
-            heroIndex = i;
-        }
+let heroIndex = -1
+let val = parseInt(sessionStorage.getItem('curr_hero_id'));
+for(let i = 0; i < HEROES.length && heroIndex === -1; i++){
+    if(HEROES[i].id === val){
+        heroIndex = i;
     }
 }
+//console.log(HEROES);
+HEROES[heroIndex].id_curr_img = parseInt(sessionStorage.getItem('curr_skin_id'));
+let divBtnsSkind = document.querySelector("#div-btns-skins");
+let btnNextSkin = document.querySelector("#btn-next-skin");
+let btnPrevSkin = document.querySelector("#btn-prev-skin");
+btnNextSkin.addEventListener("click",()=>{
+    HEROES[heroIndex].id_curr_img = (HEROES[heroIndex].id_curr_img+1)%HEROES[heroIndex].id_skins.length;
+    updateCards();
+});
+btnPrevSkin.addEventListener("click",()=>{
+    HEROES[heroIndex].id_curr_img = (HEROES[heroIndex].id_curr_img-1+HEROES[heroIndex].id_skins.length)%HEROES[heroIndex].id_skins.length;
+    updateCards();
+});
+//console.log(parseInt(sessionStorage.getItem('curr_hero_id')));
 //console.log(heroIndex);
 
 document.getElementById("coins-text").innerText = game.coins;
@@ -24,17 +34,16 @@ document.getElementById("coins-text").innerText = game.coins;
 //console.log(HEROES);
 //console.log(EFFECTS);
 
-
-updateCards();
-
 document.getElementById('btn_next').addEventListener('click', () =>
 {
     heroIndex = (heroIndex + 1) % HEROES.length;
     updateCards();
+    console.log("btn_next")
 
 });
 document.getElementById('btn_previous').addEventListener('click', () =>
 {
+    console.log("btn_previous")
     heroIndex = (heroIndex + HEROES.length - 1) % HEROES.length;
     updateCards();
 
@@ -52,14 +61,28 @@ function updateCards(){
     let img  = btn.children[1];
     if(HEROES[heroIndex].isEnabled()){
         btn.disabled = false;
+        if(HEROES[heroIndex].isUnlocked()){
+            btnPrevSkin.style.visibility = "visible";
+            btnNextSkin.style.visibility = "visible";
+            btnPrevSkin.disabled = false;
+            btnNextSkin.disabled = false;
+        }else{
+            text.style.margin = "auto 0 auto auto";
+            btnPrevSkin.style.visibility = "hidden";
+            btnNextSkin.style.visibility = "hidden";
+            btnPrevSkin.disabled = true;
+            btnNextSkin.disabled = true;
+        }
         if(HEROES[heroIndex].getSkin().owned){
             //btn play
             text.innerText = 'Play';
+            text.style.margin = "auto auto auto auto";
             btn.addEventListener('click', play);
             btn.removeEventListener('click', buy);
             btn.classList.toggle('animation-hover', true);
             btn.style.background = '#18f300';
             img.style.display = "none";
+
         }else{
             //btn buy
             text.innerText = HEROES[heroIndex].getSkin().price;
@@ -77,6 +100,8 @@ function updateCards(){
                 btn.classList.toggle('animation-hover', true);
                 btn.style.background = '#18f300';
             }
+
+
         }
     }else{
         //btn disabled
@@ -134,3 +159,5 @@ function buy() {
     btn.value = HEROES[heroIndex].getSkin().id;
     document.getElementById("form-btn").action = "buy_hero.php";
 }
+
+updateCards();

@@ -329,6 +329,7 @@ export class GameObject
         this._is_corroded = false;
         this._interaction_type = GameObject.INTERACTION_DEFAULT;
         this._damage_multiplier = 1;
+        this._id_original_skin = this._id_curr_img;
 
 
 
@@ -429,6 +430,9 @@ export class GameObject
 
 
     // Methods
+    isUnlocked(){
+        return GameInstance.getInstance().SKINS[this.id_skins[this._id_original_skin]].owned;
+    }
     isEnabled()
     {
         return this._spawn_indicator > 0;

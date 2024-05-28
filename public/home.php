@@ -51,19 +51,38 @@ check_login();
     game.initializeEffects(<?php echo (json_encode(getEffects(CONN))); ?>)
     game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN))); ?>);
     //console.log(game.SKINS);
-    console.log(game.HEROES);
-
+    //console.log(game.HEROES);
 
     sessionStorage.setItem('curr_hero_id', <?php
+        $hero_id = 0;
         if (isset($_SESSION[SESSION_HOME_CURR_HERO]))
         {
-            echo $_SESSION[SESSION_HOME_CURR_HERO];
+            $hero_id = $_SESSION[SESSION_HOME_CURR_HERO];
         }
         else
         {
-            echo 1;
+            $hero_id = 1;
         }
+        echo($hero_id);
         $_SESSION[SESSION_HOME_CURR_HERO] = null;
+        ?>);
+    sessionStorage.setItem('curr_skin_id', <?php
+        if (isset($_SESSION[SESSION_HOME_HERO_SKIN]))
+        {
+            echo $_SESSION[SESSION_HOME_HERO_SKIN];
+        }
+        else
+        {
+            $hero = getHeroById(CONN, $hero_id);
+            $val = -1;
+            for($i = 0; $i < sizeof($hero["id_skins"]) && $val === -1; $i++){
+                if($hero["id_skins"][$i] === $hero["id_curr_img"]){
+                    $val = $i;
+                }
+            }
+            echo($val);
+        }
+        $_SESSION[SESSION_HOME_HERO_SKIN] = null;
         ?>);
 
 </script>
@@ -103,12 +122,17 @@ check_login();
     </nav>
     <!-- coins -->
     <div id="div-coins" class="container text-center">
+
         <p id="coins-text">99999</p>
         <img id="coin" src="assets/images/icons/coin_icon.png" alt="coins">
 
     </div>
+    <div id="div-btns-skins" style="margin-left: auto;margin-right: auto; display: flex">
+        <button id="btn-prev-skin" style="margin-left: auto;margin-right: 0.5%;width: 3%;"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
+        <button id="btn-next-skin" style="margin-left: 0.5%;margin-right: auto;width: 3%;"><i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+    </div>
 
-    <div style="width: 60%; margin: 1% auto 0;" class="container-fluid text-center position-relative row">
+    <div style="width: 60%; margin: 0.4% auto 0;" class="container-fluid text-center position-relative row">
 
         <div style="padding: 0;" class="col-1">
             <div style="width: 100%; height: 30%;"></div>
@@ -171,7 +195,7 @@ check_login();
         <form id="form-btn" method="post" action="">
             <button id="btn-play" type="submit" name="val">
                 <b style="width: 55%;color: white;margin: auto; font-size: 180%">500</b>
-                <img style="width: 40%; height: 40%;padding-left: 2%; margin: auto;" src="assets/images/icons/coin_icon.png" alt="coins">
+                <img style="width: 30%; height: 30%;padding-left: 2%; margin: auto 0 auto 0;" src="assets/images/icons/coin_icon.png" alt="coins">
             </button>
         </form>
     </div>

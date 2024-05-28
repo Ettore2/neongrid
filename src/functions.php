@@ -328,6 +328,22 @@ function getHeroById(mysqli $connect, int $id_hero): array
 
     return $hero;
 }
+function getSkinById(mysqli $connect, int $id_skin): array
+{
+    $sql = "select skin.id,skin.img,skin.id_object,price.value as price
+    FROM skin
+    join price on skin.id_price = price.id
+    where skin.id = ?";
+    $stmt = $connect->prepare($sql);
+    $stmt->bind_param("i" ,$id_skin);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $row["id"] = (int)$row["id"];
+    $row["id_object"] = (int)$row["id_object"];
+    $row["price"] = (int)$row["price"];
+    return $row;
+}
 function getSkinPrice(mysqli $connect, int $id_skin): int
 {
     //need the cast type (by default they are strings)

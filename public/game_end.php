@@ -53,9 +53,9 @@ check_login();
 
     insertRun(CONN, $id_user, $id_skin, $played_turns, $coins, $played_time, $version['id']);
 
-    $_SESSION[SESSION_HOME_CURR_HERO] = $id_hero;
+$_SESSION[SESSION_HOME_CURR_HERO] = $id_hero;
+$_SESSION[SESSION_HOME_HERO_SKIN] = $index;
 
-    //$_SESSION[SESSION_IS_DEAD] = null;
 
 ?>
 
