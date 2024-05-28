@@ -12,6 +12,7 @@ require_once ('../includes/session.php');
               content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>register!</title>
+        <link rel="icon" href="assets/images/icons/logo.jpeg" >
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
         <link href="css/colors.css" rel="stylesheet" type="text/css">
         <link href="css/fonts.css" rel="stylesheet" type="text/css">
@@ -43,7 +44,7 @@ require_once ('../includes/session.php');
                                     <label class="form-label" for="password">Password</label>
                                 </div>
                                 <div class="d-flex justify-content-center">
-                                    <button type="submit" class="btn btn-primary btn-lg background-color-7">Enter!</button>
+                                    <button type="submit" class="btn btn-primary btn-lg background-color-7 no-border">Enter!</button>
                                 </div>
                                 <p class="text-color-2 text-center mt-5 mb-0" style="font-weight: bold;">you already have an account? <a class="text-color-1" style="text-decoration: none !important;" href="index.php">login there</a></p>
                             </form>

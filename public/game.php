@@ -15,6 +15,8 @@ check_login();
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="icon" href="assets/images/icons/logo.jpeg" >
+    <title>Game</title>
     <link href="css/colors.css" rel="stylesheet">
     <link href="css/fonts.css" rel="stylesheet">
     <link href="css/game.css" rel="stylesheet">
@@ -55,7 +57,7 @@ check_login();
         game.initializeHeroes(<?php echo (json_encode(getHeroes(CONN))); ?>);
         game.initializeObjects(<?php echo (json_encode(getObjects(CONN))); ?>);
 
-        console.log(game.HEROES);
+        //console.log(game.HEROES);
         //console.log("-----------------------------------");
     </script>
 

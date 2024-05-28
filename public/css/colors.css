@@ -37,6 +37,11 @@ Midnight Dreams: RGB(5, 28, 44)
     background: rgb(20, 4, 47);
 }
 
+.no-border
+{
+    border-width: 0;
+}
+
 .text-color-1
 {
     color: rgb(255, 241, 0);

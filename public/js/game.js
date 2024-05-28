@@ -19,6 +19,7 @@ game.abilityCard.addEventListener('click', (e) =>{
     let ability = game.player.active()
     if(ability.currCd === 0){
         ability.execute({"val":0, "owner":game.player,"target":null});
+
         graphicUpdate();
     }
 
@@ -38,6 +39,7 @@ for (let i = 0; i < game.gameCards.length; i++)
 
         //get actors
         let obj = game.getCellByCard(getFather(e.target)).obj;
+        let coord = game.getCoordinates(game.getCellByObj(obj));
         if(obj.click()){
             game.playedTurns++;
 
@@ -69,16 +71,9 @@ for (let i = 0; i < game.gameCards.length; i++)
                     }
                 }
             }
-            /*
-            for(let x = 0; x < game.gameGrid.length; x++){
-                for(let y = 0; y < game.gameGrid[x].length; y++){
-                    if(game.gameGrid[x][y].obj.haveUses() && game.gameGrid[x][y].obj.uses <= 0){
-                        game.gameGrid[x][y].obj.die(null)
-                    }
-                }
-            }*/
 
             game.player.active().decreaseCd();
+            hoverGameCell.obj = game.gameGrid[coord[0]][coord[1]].obj;
 
             graphicUpdate();
         }
@@ -102,18 +97,20 @@ for (let i = 0; i < game.gameCards.length; i++)
 
         //compile hover card
         hoverGameCell.obj = objTmp;
-        hoverGameCell.graphicUpdatePlus();
 
         //change the visibility
         let cardHover = document.querySelector('#hover-card');
         cardHover.style.transitionDuration = "0.8s";
         cardHover.style.opacity = 1;
+
+        graphicUpdate()
     });
     game.gameCards[i].addEventListener('mouseleave', () =>
     {
         document.querySelector('#hover-card').style.transitionDuration = "0.5s";
         document.querySelector('#hover-card').style.opacity = '0';
     });
+
     if(i === parseInt((game.rows*game.columns-1)/2)){
         game.gameGrid[parseInt(i%game.columns)].push(new GameCell(game.gameCards[i],game.player));
         //console.log(game.player);
@@ -127,7 +124,26 @@ for (let i = 0; i < game.gameCards.length; i++)
 }
 //console.log(gameGrid);
 
+game.playerWeapon.card.addEventListener('mouseover', (e) =>
+{
 
+    //find the obj of the calling card
+    let objTmp = game.playerWeapon.obj;
+
+    //compile hover card
+    hoverGameCell.obj = objTmp;
+    hoverGameCell.graphicUpdatePlus();
+
+    //change the visibility
+    let cardHover = document.querySelector('#hover-card');
+    cardHover.style.transitionDuration = "0.8s";
+    cardHover.style.opacity = 1;
+});
+game.playerWeapon.card.addEventListener('mouseleave', () =>
+{
+    document.querySelector('#hover-card').style.transitionDuration = "0.5s";
+    document.querySelector('#hover-card').style.opacity = '0';
+});
 
 graphicUpdate();
 
@@ -139,8 +155,6 @@ document.querySelector('#quit-btn').addEventListener('click', () =>
     const game = GameInstance.getInstance();
     game.player.die(null);
 });
-
-
 
 
 
@@ -175,6 +189,11 @@ function graphicUpdate()
         game.abilityCard.style.backgroundColor = game.player.active().color_bg_disabled;
         game.abilityCard.style.borderColor = game.player.active().color_bd_disabled;
     }
+
+    if(hoverGameCell.obj !== null){
+        hoverGameCell.graphicUpdatePlus();
+    }
+
 
 }
 function createNewObject()
