@@ -66,7 +66,7 @@ function updateCards(){
             btn.removeEventListener('click', play);
             btn.addEventListener('click', buy);
             img.style.display = "block";
-            if(game.coins < HEROES[heroIndex].price)
+            if(game.coins < HEROES[heroIndex].getSkin().price)
             {
                 btn.classList.toggle('animation-hover', false);
                 btn.style.background = '#FF0000';

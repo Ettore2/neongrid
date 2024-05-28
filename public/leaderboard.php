@@ -4,6 +4,7 @@ require_once ('../includes/session.php');
 require_once ('../src/functions.php');
 require_once ('../config/connect.php');
 check_login();
+$id_user = getUserIdFromEmail(CONN, $_SESSION[SESSION_EMAIL]);
 ?>
 
 <!doctype html>
@@ -17,6 +18,7 @@ check_login();
     <link rel="icon" href="assets/images/icons/logo.jpeg" >
     <link href="css/colors.css" rel="stylesheet">
     <link href="css/fonts.css" rel="stylesheet">
+    <link href="css/leaderboard.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
@@ -97,21 +99,42 @@ check_login();
                     $position = 1;
                     while ($row = $result->fetch_assoc())
                     {
-                        echo '<tr>';
-                        echo '<th style="width: 8%" scope="row">'.$position.'</th>';
-                        $img = "assets/images/cards/".$row['img'];
-                        ?>
-                        <td style="width: 8%; margin-left: auto; margin-right: auto;">
-                            <img style="width: 100%; height: 100%;" src="<?=$img?>" alt="hero img">
-                        </td>
-                        <?php
-                        echo '<td>'.$row['name'].'</td>';
-                        echo '<td>'.$row['id'].'</td>';
-                        echo '<td>'.$row['username'].'</td>';
-                        echo '<td>'.$row['turns'].'</td>';
-                        echo '<td>'.$row['coins'].'</td>';
-                        echo '<td>'.$row['duration'].'s'.'</td>';
-                        echo '</tr>';
+                        if ($row['id'] === $id_user)
+                        {
+                            echo '<th class="user-row" style="width: 8%;" scope="row">' .$position.'</th>';
+                            $img = "assets/images/cards/".$row['img'];
+                            ?>
+                            <td class="user-row" style="width: 8%; margin-left: auto; margin-right: auto;">
+                                <img style="width: 100%; height: 100%;" src="<?=$img?>" alt="hero img">
+                            </td>
+                            <?php
+                            echo '<td class="user-row">'.$row['name'].'</td>';
+                            echo '<td class="user-row">'.$row['id'].'</td>';
+                            echo '<td class="user-row">'.$row['username'].'</td>';
+                            echo '<td class="user-row">'.$row['turns'].'</td>';
+                            echo '<td class="user-row">'.$row['coins'].'</td>';
+                            echo '<td class="user-row">'.$row['duration'].'s'.'</td>';
+                            echo '</tr>';
+                        }
+                        else
+                        {
+                            echo '<th class="non-user-row" style="width: 8%" scope="row">'.$position.'</th>';
+                            $img = "assets/images/cards/".$row['img'];
+                            ?>
+                            <td class="non-user-row" style="width: 8%; margin-left: auto; margin-right: auto;">
+                                <img style="width: 100%; height: 100%;" src="<?=$img?>" alt="hero img">
+                            </td>
+                            <?php
+                            echo '<td class="non-user-row">'.$row['name'].'</td>';
+                            echo '<td class="non-user-row">'.$row['id'].'</td>';
+                            echo '<td class="non-user-row">'.$row['username'].'</td>';
+                            echo '<td class="non-user-row">'.$row['turns'].'</td>';
+                            echo '<td class="non-user-row">'.$row['coins'].'</td>';
+                            echo '<td class="non-user-row">'.$row['duration'].'s'.'</td>';
+                            echo '</tr>';
+                        }
+
+
                         $position++;
                     }
                     echo '</tbody>';
@@ -124,7 +147,7 @@ check_login();
         <div style="width: 50%;">
             <div class="container-fluid col-10" style="margin-left: 3%; margin-top: 3%;padding-top: 5%">
                 <?php
-                $result = getBestRunView(CONN, getUserIdFromEmail(CONN, $_SESSION[SESSION_EMAIL]), getLatestVersion(CONN)['id']);
+                $result = getBestRunView(CONN, $id_user, getLatestVersion(CONN)['id']);
                 if ($result !== NULL)
                 {
                     echo '<table class="table table-hover table-striped">';
